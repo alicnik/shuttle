@@ -12,7 +12,7 @@ router.post('/webhook', upload.none(), async (req, res) => {
   try {
     const data = req.body;
     const username = data.to.slice(0, data.to.indexOf('@'));
-
+    console.log('Data', { ...data });
     await db.user.create({
       data: {
         id: username,
@@ -21,6 +21,7 @@ router.post('/webhook', upload.none(), async (req, res) => {
         },
       },
     });
+
     res.status(200).send('Email processed successfully.');
   } catch (err) {
     console.error(err);
@@ -47,6 +48,8 @@ router.get('/:userId/last', async (req, res) => {
     res.status(404).send('Email not found.');
     return;
   }
+
+  console.log('email', email);
 
   res.status(200).send(email.html);
 });
