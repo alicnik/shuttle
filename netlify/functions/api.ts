@@ -10,9 +10,9 @@ const upload = multer();
 
 router.post('/webhook', upload.none(), async (req, res) => {
   try {
-    const data = req.body as { to: `${string}@shuttle.email`; html: string };
+    const data = req.body;
     const username = data.to.slice(0, data.to.indexOf('@'));
-    console.log('Data', { ...data });
+
     await db.user.create({
       data: {
         id: username,
@@ -48,8 +48,6 @@ router.get('/:userId/last', async (req, res) => {
     res.status(404).send('Email not found.');
     return;
   }
-
-  console.log('email', email);
 
   res.status(200).send(email.html);
 });
