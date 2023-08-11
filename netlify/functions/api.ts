@@ -20,6 +20,7 @@ router.post('/webhook', async (req, res) => {
 router.get('/:userId/last', async (req, res) => {
   const { userId } = req.params;
   console.log(userId);
+  res.status(200).send('User says hi');
 });
 
 app.use('/api/', router);
