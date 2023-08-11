@@ -6,7 +6,7 @@
   "author": "immediatealex <alex.nicholas@immediate.co.uk>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "prisma generate && tsc"
   },
   "dependencies": {
     "@netlify/functions": "^1.6.0",
