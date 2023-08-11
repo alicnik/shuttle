@@ -10,14 +10,14 @@ const upload = multer();
 
 router.post('/webhook', upload.none(), async (req, res) => {
   try {
-    const data = req.body as { to: `${string}@shuttle.email`; text: string; html: string };
+    const data = req.body as { to: `${string}@shuttle.email`; html: string };
     const username = data.to.slice(0, data.to.indexOf('@'));
     console.log('Data', { ...data });
     await db.user.create({
       data: {
         id: username,
         emails: {
-          create: [{ html: data.html, text: data.text }],
+          create: [{ html: data.html }],
         },
       },
     });
