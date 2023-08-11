@@ -1,15 +1,17 @@
 import 'dotenv/config';
 import express, { Router } from 'express';
 import serverless from 'serverless-http';
+import multer from 'multer';
 import { db } from '../../lib/db';
 
 const app = express();
 const router = Router();
+const upload = multer();
 
-router.post('/webhook', async (req, res) => {
+router.post('/webhook', upload.none(), async (req, res) => {
   try {
-    const emailData = req.body;
-    console.log(req.body);
+    const data = req.body;
+    console.log({ ...data });
     res.status(200).send('Email processed successfully.');
   } catch (err) {
     console.error(err);
