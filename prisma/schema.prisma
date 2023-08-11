@@ -20,7 +20,8 @@ model User {
 model Email {
   id         String   @id @default(cuid())
   created_at DateTime @default(now())
-  body       String
+  text       String
+  html       String
   user       User?    @relation(fields: [userId], references: [id])
   userId     String?
 

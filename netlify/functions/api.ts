@@ -11,7 +11,16 @@ const upload = multer();
 router.post('/webhook', upload.none(), async (req, res) => {
   try {
     const data = req.body;
-    console.log({ ...data });
+    const username = data.to.slice(0, data.to.indexOf('@'));
+
+    await db.user.create({
+      data: {
+        id: username,
+        emails: {
+          create: [{ html: data.html, text: data.text }],
+        },
+      },
+    });
     res.status(200).send('Email processed successfully.');
   } catch (err) {
     console.error(err);
@@ -21,8 +30,25 @@ router.post('/webhook', upload.none(), async (req, res) => {
 
 router.get('/:userId/last', async (req, res) => {
   const { userId } = req.params;
-  console.log(userId);
-  res.status(200).send('User says hi');
+
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    include: { emails: true },
+  });
+
+  if (!user) {
+    res.status(404).send('User not found.');
+    return;
+  }
+
+  const email = user.emails[0];
+
+  if (!email) {
+    res.status(404).send('Email not found.');
+    return;
+  }
+
+  res.status(200).send(email.html);
 });
 
 app.use('/api/', router);
