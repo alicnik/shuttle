@@ -1,4 +1,4 @@
-import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
+import type { Handler } from '@netlify/functions';
 import { schedule } from '@netlify/functions';
 import { db } from '../../lib/db';
 
