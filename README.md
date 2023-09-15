@@ -11,7 +11,9 @@ Email testing app, basically a super-simple Putsbox without a UI.
 
 ## What can it do?
 
-At the moment, it provides a wrapper around the Sendgrid Inbound Parse Webhook. Any email sent to `<userId>@shuttle.email` causes that user to be automatically created and any associated emails stored in a `shuttle_db` database hosted on Planetscale. You can then call `https://shuttle-app.netlify.com/api/<userId>/last` to get that user's last email.
+At the moment, it provides a wrapper around the Sendgrid Inbound Parse Webhook. Any email sent to `<userId>@shuttle.email` causes that user to be automatically created and that email to be stored in a `shuttle_db` database hosted on Planetscale. You can then call `https://shuttle-app.netlify.com/api/<userId>/last` to get that user's last email.
+
+This probably doesn't work with multiple emails sent to the same address yet.
 
 ## Development
 
