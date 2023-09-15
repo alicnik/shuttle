@@ -1,0 +1,15 @@
+import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
+import { schedule } from '@netlify/functions';
+import { db } from '../../lib/db';
+
+const myHandler: Handler = async () => {
+  await db.user.deleteMany();
+
+  return {
+    statusCode: 204,
+  };
+};
+
+const handler = schedule('@daily', myHandler);
+
+export { handler };

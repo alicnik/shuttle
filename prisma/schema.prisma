@@ -21,7 +21,7 @@ model Email {
   id         String   @id @default(cuid())
   created_at DateTime @default(now())
   html       String   @db.LongText
-  user       User?    @relation(fields: [userId], references: [id])
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String?
 
   @@index([userId])
