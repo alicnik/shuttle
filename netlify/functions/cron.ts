@@ -4,6 +4,11 @@ import { db } from '../../lib/db';
 
 const myHandler: Handler = async () => {
   await db.user.deleteMany();
+  await db.email.deleteMany({
+    where: {
+      userId: null,
+    },
+  });
 
   return {
     statusCode: 204,
