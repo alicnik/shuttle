@@ -13,11 +13,17 @@ router.post('/webhook', upload.none(), async (req, res) => {
     const data = req.body;
     const username = data.to.slice(0, data.to.indexOf('@'));
 
-    await db.user.create({
-      data: {
+    await db.user.upsert({
+      where: { id: username },
+      create: {
         id: username,
         emails: {
-          create: [{ html: data.html }],
+          create: { html: data.html },
+        },
+      },
+      update: {
+        emails: {
+          create: { html: data.html },
         },
       },
     });
@@ -27,6 +33,22 @@ router.post('/webhook', upload.none(), async (req, res) => {
     console.error(err);
     res.status(500).send('Error processing email.');
   }
+});
+
+router.get('/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    include: { emails: true },
+  });
+
+  if (!user) {
+    res.status(404).send('User not found.');
+    return;
+  }
+
+  res.status(200).send(user.emails);
 });
 
 router.get('/:userId/last', async (req, res) => {
