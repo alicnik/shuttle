@@ -10,9 +10,7 @@ import {
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 
-export const meta: MetaFunction = () => {
-  return { title: "New Remix App" };
-};
+export const meta: MetaFunction = () => [{ title: "New Remix App" }];
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
