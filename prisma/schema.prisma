@@ -18,11 +18,15 @@ model User {
 }
 
 model Email {
-  id         String   @id @default(cuid())
-  created_at DateTime @default(now())
-  html       String   @db.LongText
-  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String?
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  from      String
+  subject   String?
+  html      String   @db.LongText
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+  read      Boolean  @default(false)
+  text      String?   @db.Text
 
   @@index([userId])
 }

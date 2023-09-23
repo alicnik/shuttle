@@ -12,18 +12,24 @@ router.post('/webhook', upload.none(), async (req, res) => {
   try {
     const data = req.body;
     const username = data.to.slice(0, data.to.indexOf('@'));
+    const email = {
+      from: data.from,
+      subject: data.subject,
+      html: data.html,
+      text: data.text,
+    };
 
     await db.user.upsert({
       where: { id: username },
       create: {
         id: username,
         emails: {
-          create: { html: data.html },
+          create: email,
         },
       },
       update: {
         emails: {
-          create: { html: data.html },
+          create: email,
         },
       },
     });
