@@ -1,7 +1,11 @@
-yarn-error.log
 node_modules
-dist
-.env
+/.cache
+/netlify/functions/server/index.js
+/public/build
+/.netlify
 
-# Local Netlify folder
-.netlify
+/.env
+
+/app/styles/tailwind.css
+
+cypress/videos/
