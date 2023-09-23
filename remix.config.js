@@ -13,5 +13,6 @@ module.exports = {
       : undefined,
   ignoredRouteFiles: ["**/.*"],
   appDirectory: "app",
+  tailwind: true,
   assetsBuildDirectory: "public/build",
 };
