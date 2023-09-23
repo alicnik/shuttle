@@ -26,6 +26,7 @@ model Email {
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
   read      Boolean  @default(false)
+  text      String?   @db.Text
 
   @@index([userId])
 }

@@ -66,9 +66,9 @@ export function Inbox({ data, columns }: InboxProps<Email>) {
       rowSelection,
     },
   });
-  console.log({ columns });
+
   return (
-    <div className="w-full px-24">
+    <div className="w-full">
       <div className="flex items-center py-4">
         <Input
           placeholder="Search"
@@ -92,20 +92,20 @@ export function Inbox({ data, columns }: InboxProps<Email>) {
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize"
+                    className="capitalize hover:bg-slate-700"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {column.id === 'createdAt' ? 'received' : column.id}
                   </DropdownMenuCheckboxItem>
                 );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -136,6 +136,7 @@ export function Inbox({ data, columns }: InboxProps<Email>) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  className=" hover:bg-slate-700 data-[state=selected]:bg-slate-700"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
