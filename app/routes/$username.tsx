@@ -3,6 +3,7 @@ import {
   Form,
   useLoaderData,
   useNavigation,
+  useRevalidator,
   useSubmit,
 } from '@remix-run/react';
 import invariant from 'tiny-invariant';
@@ -21,13 +22,18 @@ import {
   EmailPreviewHeader,
   Tooltip,
 } from '~/components';
-import { EnvelopeClosedIcon, TrashIcon } from '@radix-ui/react-icons';
+import {
+  EnvelopeClosedIcon,
+  TrashIcon,
+  UpdateIcon,
+} from '@radix-ui/react-icons';
 import {
   deleteEmails,
   markEmailsAsRead,
   markEmailsAsUnread,
 } from '~/models/email.server';
 import { AlertDialogTrigger } from '~/components/ui/alert-dialog';
+import clsx from 'clsx';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { username } = params;
@@ -45,7 +51,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const action = formData.get('_action');
-  console.log({ action });
   switch (action) {
     case 'markRead': {
       const emailId = String(formData.get('emailId'));
@@ -89,9 +94,42 @@ export default function UserInbox() {
   const navigation = useNavigation();
   const [selected, setSelected] = React.useState<string[]>([]);
   const [preview, setPreview] = React.useState<string | null>(null);
+  const [isRevalidating, setIsRevalidating] = React.useState(false);
 
   const [searchTerm, setSearchTerm] = React.useState('');
   const { user } = useLoaderData<typeof loader>();
+  const revalidator = useRevalidator();
+
+  React.useEffect(() => {
+    const intervalId = setInterval(revalidator.revalidate, 30000);
+    return () => clearInterval(intervalId);
+  });
+
+  React.useEffect(() => {
+    if (revalidator.state === 'idle') {
+      return;
+    }
+
+    let timeoutId: NodeJS.Timeout;
+    if (revalidator.state === 'loading') {
+      setIsRevalidating(true);
+      timeoutId = setTimeout(() => {
+        setIsRevalidating(false);
+      }, 1500);
+    }
+    return () => {
+      if (revalidator.state === 'idle') {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [revalidator.state]);
+
+  React.useEffect(() => {
+    const revalideOnFocus = () => revalidator.revalidate();
+    window.addEventListener('focus', revalideOnFocus);
+    return () => window.removeEventListener('focus', revalideOnFocus);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const emailsBeingDeleted = React.useMemo(() => {
     const isInFlight = ['submitting', 'loading'].includes(navigation.state);
@@ -201,6 +239,20 @@ export default function UserInbox() {
                     </AlertDialogTrigger>
                   </Tooltip>
                 </AlertDialog>
+                <Tooltip content="Check for new emails">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    type="button"
+                    onClick={() => {
+                      revalidator.revalidate();
+                    }}
+                  >
+                    <UpdateIcon
+                      className={clsx(isRevalidating && 'animate-spin')}
+                    />
+                  </Button>
+                </Tooltip>
               </div>
               {emailsToDisplay.map((email, index) => {
                 return (
