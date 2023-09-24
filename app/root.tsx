@@ -11,7 +11,7 @@ import {
 import mainStylesheetUrl from './main.css';
 import tailwindStylesheetUrl from './tailwind.css';
 
-export const meta: MetaFunction = () => [{ title: 'New Remix App' }];
+export const meta: MetaFunction = () => [{ title: 'Shuttle' }];
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: mainStylesheetUrl },
