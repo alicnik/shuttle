@@ -64,10 +64,10 @@ export function EmailCard({
         data-read={!isOptimisticUnread && (email.read || isOptimisticRead)}
         className="w-full cursor-pointer text-left data-[read=true]:opacity-50"
         onClick={() => {
-          if (!selected.includes(email.id)) {
-            setSelected((selected) => [...selected, email.id]);
-          }
           setPreview((currentPreview) => {
+            if (selected.length) {
+              setSelected([]);
+            }
             if (currentPreview) {
               submit(
                 { emailId: currentPreview, _action: 'markRead' },
