@@ -157,7 +157,7 @@ export default function UserInbox() {
     .filter(
       ({ subject, text }) =>
         subject?.toLowerCase().includes(searchTerm) ||
-        text.toLowerCase().includes(searchTerm)
+        text?.toLowerCase().includes(searchTerm)
     )
     .map((email) => ({ ...email, createdAt: new Date(email.createdAt) }));
 
@@ -165,7 +165,7 @@ export default function UserInbox() {
 
   return (
     <>
-      <div className="flex h-full w-full gap-6 rounded-md p-4">
+      <div className="container mx-auto flex h-full w-full gap-6 rounded-md p-4">
         <div className="w-96 rounded-md">
           <div className="mb-8 flex items-baseline justify-between">
             <h1 className=" text-3xl font-bold">Inbox</h1>

@@ -30,7 +30,7 @@ export default function Index() {
     <div className="flex flex-col items-center">
       <h1 className="mt-16 text-8xl font-bold">Shuttle</h1>
       <p className="text-lg">
-        A temporary email service that minimises back and forth
+        A temporary email service that minimises the back and forth
       </p>
       <img
         width={150}

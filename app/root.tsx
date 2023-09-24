@@ -27,7 +27,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="container mx-auto h-full bg-zinc-900">
+      <body className="h-full bg-zinc-900">
         <Outlet />
         <ScrollRestoration />
         <Scripts />
