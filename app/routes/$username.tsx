@@ -178,7 +178,7 @@ export default function UserInbox() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           {emailsToDisplay.length ? (
-            <Form method="post">
+            <Form method="post" className="h-full">
               <input type="hidden" name="selected" value={selected.join(',')} />
               <div className="mb-6 flex gap-4">
                 <Checkbox
@@ -255,22 +255,24 @@ export default function UserInbox() {
                   </Button>
                 </Tooltip>
               </div>
-              {emailsToDisplay.map((email, index) => {
-                return (
-                  <React.Fragment key={email.id}>
-                    <EmailCard
-                      email={email}
-                      selected={selected}
-                      setSelected={setSelected}
-                      preview={preview}
-                      setPreview={setPreview}
-                    />
-                    {index !== emailsToDisplay.length - 1 && (
-                      <Separator className="mb-4" />
-                    )}
-                  </React.Fragment>
-                );
-              })}
+              <div className="email-list h-full overflow-y-auto">
+                {emailsToDisplay.map((email, index) => {
+                  return (
+                    <React.Fragment key={email.id}>
+                      <EmailCard
+                        email={email}
+                        selected={selected}
+                        setSelected={setSelected}
+                        preview={preview}
+                        setPreview={setPreview}
+                      />
+                      {index !== emailsToDisplay.length - 1 && (
+                        <Separator className="mb-4" />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
             </Form>
           ) : (
             <p className="text-sm italic">

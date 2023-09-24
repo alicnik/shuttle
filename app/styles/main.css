@@ -13,6 +13,21 @@
   border: 2px solid rgb(228 228 231);
 }
 
+.email-list {
+  max-height: calc(100% - 188px);
+}
+
+.email-list::-webkit-scrollbar {
+  width:10px;
+  background: transparent;
+}
+
+.email-list::-webkit-scrollbar-thumb {
+  background: rgb(228 228 231);
+  border-radius: 9999px;
+  border: 2px solid rgb(24 24 27);
+}
+
 :root {
   --logo-rotation: 135deg;
   --logo-vertical-offset: -30px;
