@@ -103,7 +103,8 @@ export default function UserInbox() {
   React.useEffect(() => {
     const intervalId = setInterval(revalidator.revalidate, 30000);
     return () => clearInterval(intervalId);
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   React.useEffect(() => {
     if (revalidator.state === 'idle') {
