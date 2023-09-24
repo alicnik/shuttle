@@ -15,10 +15,11 @@ import type {
 } from '@remix-run/node';
 import { Input, Separator, Button, Checkbox } from '~/components/ui';
 import {
+  AlertDialog,
   EmailCard,
-  Tooltip,
   EmailPreviewBody,
   EmailPreviewHeader,
+  Tooltip,
 } from '~/components';
 import { EnvelopeClosedIcon, TrashIcon } from '@radix-ui/react-icons';
 import {
@@ -26,17 +27,7 @@ import {
   markEmailsAsRead,
   markEmailsAsUnread,
 } from '~/models/email.server';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '~/components/ui/alert-dialog';
+import { AlertDialogTrigger } from '~/components/ui/alert-dialog';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { username } = params;
@@ -59,6 +50,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     case 'markRead': {
       const emailId = String(formData.get('emailId'));
       await markEmailsAsRead(emailId);
+      return new Response(null, { status: 200 });
+    }
+    case 'markUnread': {
+      const emailId = String(formData.get('emailId'));
+      await markEmailsAsUnread(emailId);
       return new Response(null, { status: 200 });
     }
     case 'markSelectedUnread': {
@@ -130,7 +126,7 @@ export default function UserInbox() {
 
   return (
     <>
-      <div className="flex h-5/6 w-full gap-6 rounded-md p-4">
+      <div className="flex h-full w-full gap-6 rounded-md p-4">
         <div className="w-96 rounded-md">
           <div className="mb-8 flex items-baseline justify-between">
             <h1 className=" text-3xl font-bold">Inbox</h1>
@@ -173,7 +169,23 @@ export default function UserInbox() {
                     <EnvelopeClosedIcon />
                   </Button>
                 </Tooltip>
-                <AlertDialog>
+                <AlertDialog
+                  title="Are you sure?"
+                  description="This action cannot be undone."
+                  onConfirm={() => {
+                    setSelected([]);
+                    setPreview(
+                      preview && selected.includes(preview) ? null : preview
+                    );
+                    submit(
+                      {
+                        _action: 'deleteSelected',
+                        selected: selected.join(','),
+                      },
+                      { method: 'post' }
+                    );
+                  }}
+                >
                   <Tooltip content="Delete">
                     <AlertDialogTrigger asChild>
                       <Button
@@ -181,39 +193,13 @@ export default function UserInbox() {
                         name="_action"
                         value="deleteSelected"
                         variant="outline"
-                        className="hover:bg-destructive"
+                        className="hover:bg-destructive focus:bg-destructive"
                         size="icon"
                       >
                         <TrashIcon />
                       </Button>
                     </AlertDialogTrigger>
                   </Tooltip>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => {
-                          setSelected([]);
-                          setPreview(null);
-                          submit(
-                            {
-                              _action: 'deleteSelected',
-                              selected: selected.join(','),
-                            },
-                            { method: 'post' }
-                          );
-                        }}
-                      >
-                        Confirm
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
                 </AlertDialog>
               </div>
               {emailsToDisplay.map((email, index) => {
@@ -247,6 +233,8 @@ export default function UserInbox() {
                 createdAt: new Date(previewEmail.createdAt),
               }}
               userId={user.id}
+              setPreview={setPreview}
+              setSelected={setSelected}
             />
           ) : null}
           <EmailPreviewBody html={previewEmail?.html} />

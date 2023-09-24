@@ -36,7 +36,9 @@ export default function Index() {
         width={150}
         className={clsx(
           'shuttle-logo cursor-pointer',
-          isAnimating && 'shuttle-logo-animation'
+          isAnimating
+            ? 'shuttle-logo-animation'
+            : 'animate-[pulse_3s_cubic-bezier(0.4,0,0.6,1)_infinite]'
         )}
         src="/assets/shuttle.png"
         alt="Shuttle Logo"

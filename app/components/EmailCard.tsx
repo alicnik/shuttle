@@ -67,17 +67,20 @@ export function EmailCard({
       <div
         data-read={!isOptimisticUnread && (email.read || isOptimisticRead)}
         className="cursor-pointer text-left data-[read=true]:opacity-50"
-        onClick={() =>
-          setPreview((current) => {
-            if (current) {
+        onClick={() => {
+          if (!selected.includes(email.id)) {
+            setSelected((selected) => [...selected, email.id]);
+          }
+          setPreview((currentPreview) => {
+            if (currentPreview) {
               submit(
-                { emailId: current, _action: 'markRead' },
+                { emailId: currentPreview, _action: 'markRead' },
                 { method: 'post' }
               );
             }
             return email.id;
-          })
-        }
+          });
+        }}
       >
         <div className="mb-1 flex items-center ">
           <p className="mr-12 w-max text-sm font-bold">{from}</p>

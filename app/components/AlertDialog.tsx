@@ -7,7 +7,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '~/components/ui/alert-dialog';
 
 type AlertDialogProps = React.PropsWithChildren<{
@@ -24,7 +23,7 @@ export function AlertDialog({
 }: AlertDialogProps) {
   return (
     <AlertDialogComponent>
-      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+      {children}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
