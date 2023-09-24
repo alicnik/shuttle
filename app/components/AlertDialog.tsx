@@ -10,22 +10,21 @@ import {
   AlertDialogTrigger,
 } from '~/components/ui/alert-dialog';
 
-interface AlertDialogProps {
-  trigger: React.ReactNode;
+type AlertDialogProps = React.PropsWithChildren<{
   title: string;
   description: string;
   onConfirm: () => void;
-}
+}>;
 
 export function AlertDialog({
-  trigger,
+  children,
   title,
   description,
   onConfirm,
 }: AlertDialogProps) {
   return (
     <AlertDialogComponent>
-      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>

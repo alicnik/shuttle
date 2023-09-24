@@ -1,4 +1,4 @@
-import { db } from "db";
+import { db } from 'db';
 
 export const getUser = async (username: string) => {
   const user = await db.user.findUnique({
@@ -6,7 +6,11 @@ export const getUser = async (username: string) => {
       id: username,
     },
     include: {
-      emails: true,
+      emails: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
     },
   });
 

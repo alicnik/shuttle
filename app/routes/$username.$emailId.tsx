@@ -3,7 +3,6 @@ import invariant from 'tiny-invariant';
 import { getEmail } from '~/models/email.server';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  console.log({ params });
   const { username, emailId } = params;
 
   invariant(emailId, 'Email ID is required');
