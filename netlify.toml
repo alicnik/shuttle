@@ -1,8 +1,32 @@
-[functions]
-  external_node_modules = ["express"]
-  node_bundler = "esbuild"
+[build]
+  command = "npm run build"
+  functions = "netlify/functions"
+  publish = "public"
+
+  [build.environment]
+    # set TERM variable for terminal output
+    TERM = "xterm"
+
+# [functions]
+#   external_node_modules = ["express"]
+#   node_bundler = "esbuild"
+
+[dev]
+  command = "remix watch"
+  port = 3000
+
 [[redirects]]
   force = true
   from = "/api/*"
   status = 200
   to = "/.netlify/functions/api/:splat"
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200
+
+[[headers]]
+  for = "/build/*"
+  [headers.values]
+    "Cache-Control" = "public, max-age=31536000, s-maxage=31536000"

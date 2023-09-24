@@ -1,6 +1,6 @@
-import type { Handler } from '@netlify/functions';
-import { schedule } from '@netlify/functions';
-import { db } from '../../lib/db';
+import type { Handler } from "@netlify/functions";
+import { schedule } from "@netlify/functions";
+import { db } from "db";
 
 const cleanup: Handler = async () => {
   await db.user.deleteMany();
@@ -15,6 +15,6 @@ const cleanup: Handler = async () => {
   };
 };
 
-const handler = schedule('@daily', cleanup);
+const handler = schedule("@daily", cleanup);
 
 export { handler };
