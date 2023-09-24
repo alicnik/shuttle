@@ -1,4 +1,3 @@
-import type { LinksFunction, MetaFunction } from '@remix-run/node';
 import {
   Links,
   LiveReload,
@@ -7,9 +6,10 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react';
+import type { LinksFunction, MetaFunction } from '@remix-run/node';
 
-import mainStylesheetUrl from './main.css';
-import tailwindStylesheetUrl from './tailwind.css';
+import mainStylesheetUrl from './styles/main.css';
+import tailwindStylesheetUrl from './styles/tailwind.css';
 
 export const meta: MetaFunction = () => [{ title: 'Shuttle' }];
 

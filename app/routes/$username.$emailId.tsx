@@ -1,6 +1,7 @@
-import { redirect, type LoaderFunctionArgs } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import invariant from 'tiny-invariant';
 import { getEmail } from '~/models/email.server';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { username, emailId } = params;

@@ -1,12 +1,12 @@
-import { ReloadIcon } from '@radix-ui/react-icons';
-import type { ActionFunctionArgs } from '@remix-run/node';
+import * as React from 'react';
 import { json, redirect } from '@remix-run/node';
 import { Form, useActionData, useNavigation } from '@remix-run/react';
 import clsx from 'clsx';
-import * as React from 'react';
 import invariant from 'tiny-invariant';
+import { ReloadIcon } from '@radix-ui/react-icons';
 import { Button, Input } from '~/components/ui';
 import { createUser } from '~/models/user.server';
+import type { ActionFunctionArgs } from '@remix-run/node';
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();

@@ -6,14 +6,10 @@ import {
   useRevalidator,
   useSubmit,
 } from '@remix-run/react';
-import invariant from 'tiny-invariant';
-import { createUser, getUser } from '~/models/user.server';
 import { json } from '@remix-run/node';
-import type {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-  MetaFunction,
-} from '@remix-run/node';
+import invariant from 'tiny-invariant';
+import clsx from 'clsx';
+import { createUser, getUser } from '~/models/user.server';
 import { Input, Separator, Button, Checkbox } from '~/components/ui';
 import {
   AlertDialog,
@@ -33,7 +29,11 @@ import {
   markEmailsAsUnread,
 } from '~/models/email.server';
 import { AlertDialogTrigger } from '~/components/ui/alert-dialog';
-import clsx from 'clsx';
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from '@remix-run/node';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { username } = params;
