@@ -80,19 +80,6 @@ router.get('/:userId/last', async (req, res) => {
   res.status(200).send(email.html);
 });
 
-router.delete('/cleanup', async () => {
-  await db.user.deleteMany();
-  await db.email.deleteMany({
-    where: {
-      userId: null,
-    },
-  });
-
-  return {
-    statusCode: 204,
-  };
-});
-
 app.use('/api/', router);
 
 export const handler = serverless(app);
