@@ -18,14 +18,19 @@ export const getUser = async (username: string) => {
 };
 
 export const createUser = async (username: string) => {
-  const user = await db.user.create({
-    data: {
-      id: username,
-    },
-    include: {
-      emails: true,
-    },
-  });
+  try {
+    const user = await db.user.create({
+      data: {
+        id: username,
+      },
+      include: {
+        emails: true,
+      },
+    });
 
-  return user;
+    return user;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 };

@@ -1,3 +1,28 @@
 .email-preview {
   max-height: calc(100% - 197px);
 }
+
+:root {
+  --logo-rotation: 135deg;
+  --logo-vertical-offset: -30px;
+}
+
+@keyframes back-and-forth {
+  0%, 100% {
+    transform: translateX(0%) translateY(var(--logo-vertical-offset)) rotate(var(--logo-rotation));
+  }
+  25% {
+    transform: translateX(-100%) translateY(var(--logo-vertical-offset)) rotate(var(--logo-rotation));
+  }
+  75% {
+    transform: translateX(100%) translateY(var(--logo-vertical-offset)) rotate(var(--logo-rotation));
+  }
+}
+
+.shuttle-logo {
+  transform: translateY(var(--logo-vertical-offset)) rotate(var(--logo-rotation));
+}
+
+.shuttle-logo-animation {
+  animation: back-and-forth 1.25s ease-in-out forwards;
+}
