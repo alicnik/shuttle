@@ -62,7 +62,7 @@ export function EmailCard({
       />
       <div
         data-read={!isOptimisticUnread && (email.read || isOptimisticRead)}
-        className="cursor-pointer text-left data-[read=true]:opacity-50"
+        className="w-full cursor-pointer text-left data-[read=true]:opacity-50"
         onClick={() => {
           if (!selected.includes(email.id)) {
             setSelected((selected) => [...selected, email.id]);
@@ -84,8 +84,8 @@ export function EmailCard({
             {formatRelative(email.createdAt, new Date())}
           </p>
         </div>
-        <p className="mb-1 text-sm">{email.subject}</p>
-        <p className="line-clamp-2 text-xs">{email.text}</p>
+        <p className="mb-1 max-w-[250px] truncate text-sm">{email.subject}</p>
+        <p className="line-clamp-2 max-w-[300px] text-xs">{email.text}</p>
       </div>
     </div>
   );
