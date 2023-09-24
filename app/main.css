@@ -11,10 +11,10 @@
   0%, 100% {
     transform: translateX(0%) translateY(var(--logo-vertical-offset)) rotate(var(--logo-rotation));
   }
-  25% {
+  25%, 75% {
     transform: translateX(-100%) translateY(var(--logo-vertical-offset)) rotate(var(--logo-rotation));
   }
-  75% {
+  50% {
     transform: translateX(100%) translateY(var(--logo-vertical-offset)) rotate(var(--logo-rotation));
   }
 }
