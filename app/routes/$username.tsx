@@ -1,8 +1,13 @@
 import * as React from 'react';
-import { Form, useLoaderData } from '@remix-run/react';
+import {
+  Form,
+  useLoaderData,
+  useNavigation,
+  useSubmit,
+} from '@remix-run/react';
 import invariant from 'tiny-invariant';
 import { createUser, getUser } from '~/models/user.server';
-import { redirect } from '@remix-run/node';
+import { json } from '@remix-run/node';
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -16,7 +21,22 @@ import {
   EmailPreviewHeader,
 } from '~/components';
 import { EnvelopeClosedIcon, TrashIcon } from '@radix-ui/react-icons';
-import { markEmailsAsRead, markEmailsAsUnread } from '~/models/email.server';
+import {
+  deleteEmails,
+  markEmailsAsRead,
+  markEmailsAsUnread,
+} from '~/models/email.server';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '~/components/ui/alert-dialog';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { username } = params;
@@ -27,24 +47,31 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     user = await createUser(username);
   }
 
-  return { user };
+  invariant(user, 'User must exist');
+  return json({ user });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const action = formData.get('_action');
-
+  console.log({ action });
   switch (action) {
     case 'markRead': {
       const emailId = String(formData.get('emailId'));
       await markEmailsAsRead(emailId);
-      return redirect(request.url, { status: 303 });
+      return new Response(null, { status: 200 });
     }
     case 'markSelectedUnread': {
       const emailIds = String(formData.get('selected'));
       const emailIdsArray = emailIds.split(',');
       await markEmailsAsUnread(emailIdsArray);
-      return redirect(request.url, { status: 303 });
+      return new Response(null, { status: 200 });
+    }
+    case 'deleteSelected': {
+      const emailIds = String(formData.get('selected'));
+      const emailIdsArray = emailIds.split(',');
+      await deleteEmails(emailIdsArray);
+      return new Response(null, { status: 200 });
     }
     default:
       return null;
@@ -62,13 +89,36 @@ export const meta: MetaFunction<typeof loader> = ({ params, data }) => {
 };
 
 export default function UserInbox() {
+  const submit = useSubmit();
+  const navigation = useNavigation();
   const [selected, setSelected] = React.useState<string[]>([]);
   const [preview, setPreview] = React.useState<string | null>(null);
 
   const [searchTerm, setSearchTerm] = React.useState('');
   const { user } = useLoaderData<typeof loader>();
 
-  const emails = user.emails
+  const emailsBeingDeleted = React.useMemo(() => {
+    const isInFlight = ['submitting', 'loading'].includes(navigation.state);
+    if (!isInFlight) {
+      return [];
+    }
+
+    const formData = navigation.formData;
+    if (!formData) {
+      return [];
+    }
+
+    const action = formData.get('_action');
+    if (action !== 'deleteSelected') {
+      return [];
+    }
+
+    const selected = String(formData.get('selected')).split(',');
+    return selected;
+  }, [navigation]);
+
+  const emailsToDisplay = user.emails
+    .filter(({ id }) => !emailsBeingDeleted.includes(id))
     .filter(
       ({ subject, text }) =>
         subject?.toLowerCase().includes(searchTerm) ||
@@ -82,29 +132,34 @@ export default function UserInbox() {
     <>
       <div className="flex h-5/6 w-full gap-6 rounded-md p-4">
         <div className="w-96 rounded-md">
-          <h1 className="mb-8 text-3xl font-bold">Inbox</h1>
+          <div className="mb-8 flex items-baseline justify-between">
+            <h1 className=" text-3xl font-bold">Inbox</h1>
+            <span className="text-sm">{user.id}@shuttle.email</span>
+          </div>
           <Input
             className="mb-6"
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          {emails.length ? (
+          {emailsToDisplay.length ? (
             <Form method="post">
               <input type="hidden" name="selected" value={selected.join(',')} />
               <div className="mb-6 flex gap-4">
                 <Checkbox
                   className="ml-2 mr-2 mt-[10px]"
-                  checked={emails.every(({ id }) => selected.includes(id))}
+                  checked={emailsToDisplay.every(({ id }) =>
+                    selected.includes(id)
+                  )}
                   onCheckedChange={() => {
                     setSelected((selected) => {
-                      if (selected.length === emails.length) {
+                      if (selected.length === emailsToDisplay.length) {
                         if (preview) {
                           setPreview(null);
                         }
                         return [];
                       }
-                      return emails.map(({ id }) => id);
+                      return emailsToDisplay.map(({ id }) => id);
                     });
                   }}
                 />
@@ -118,18 +173,50 @@ export default function UserInbox() {
                     <EnvelopeClosedIcon />
                   </Button>
                 </Tooltip>
-                <Tooltip content="Delete">
-                  <Button
-                    name="_action"
-                    value="deleteSelected"
-                    variant="outline"
-                    size="icon"
-                  >
-                    <TrashIcon />
-                  </Button>
-                </Tooltip>
+                <AlertDialog>
+                  <Tooltip content="Delete">
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        type="button"
+                        name="_action"
+                        value="deleteSelected"
+                        variant="outline"
+                        className="hover:bg-destructive"
+                        size="icon"
+                      >
+                        <TrashIcon />
+                      </Button>
+                    </AlertDialogTrigger>
+                  </Tooltip>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          setSelected([]);
+                          setPreview(null);
+                          submit(
+                            {
+                              _action: 'deleteSelected',
+                              selected: selected.join(','),
+                            },
+                            { method: 'post' }
+                          );
+                        }}
+                      >
+                        Confirm
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
-              {emails.map((email, index) => {
+              {emailsToDisplay.map((email, index) => {
                 return (
                   <React.Fragment key={email.id}>
                     <EmailCard
@@ -139,7 +226,7 @@ export default function UserInbox() {
                       preview={preview}
                       setPreview={setPreview}
                     />
-                    {index !== emails.length - 1 && (
+                    {index !== emailsToDisplay.length - 1 && (
                       <Separator className="mb-4" />
                     )}
                   </React.Fragment>
