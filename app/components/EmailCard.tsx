@@ -21,10 +21,6 @@ export function EmailCard({
   const submit = useSubmit();
   const navigation = useNavigation();
 
-  if (navigation.state === 'submitting') {
-    console.log(Object.fromEntries(navigation.formData || []));
-  }
-
   const isOptimisticRead =
     ['submitting', 'loading'].includes(navigation.state) &&
     navigation.formData?.get('_action') === 'markRead' &&
