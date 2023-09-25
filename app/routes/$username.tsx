@@ -19,6 +19,7 @@ import {
   Tooltip,
 } from '~/components';
 import {
+  ClipboardCopyIcon,
   EnvelopeClosedIcon,
   TrashIcon,
   UpdateIcon,
@@ -34,6 +35,7 @@ import type {
   LoaderFunctionArgs,
   MetaFunction,
 } from '@remix-run/node';
+import { useToast } from '~/components/ui/use-toast';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { username } = params;
@@ -90,6 +92,7 @@ export const meta: MetaFunction<typeof loader> = ({ params, data }) => {
 };
 
 export default function UserInbox() {
+  const { toast } = useToast();
   const submit = useSubmit();
   const navigation = useNavigation();
   const [selected, setSelected] = React.useState<string[]>([]);
@@ -167,9 +170,22 @@ export default function UserInbox() {
     <>
       <div className="container mx-auto flex h-full w-full gap-6 rounded-md p-4">
         <div className="w-96 rounded-md">
-          <div className="mb-8 flex items-baseline justify-between">
-            <h1 className=" text-3xl font-bold">Inbox</h1>
-            <span className="text-sm">{user.id}@shuttle.email</span>
+          <div className="mb-8 flex items-baseline justify-between gap-3">
+            <h1 className="flex-1 text-3xl font-bold">Inbox</h1>
+            <span className="text-sm">{user.id}@shuttle.email </span>
+            <Tooltip content="Copy email address" side="bottom" sideOffset={8}>
+              <ClipboardCopyIcon
+                className="translate-y-[3px] cursor-pointer"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(
+                    `${user.id}@shuttle.email`
+                  );
+                  toast({
+                    description: 'Email address copied to clipboard.',
+                  });
+                }}
+              />
+            </Tooltip>
           </div>
           <Input
             className="mb-6"

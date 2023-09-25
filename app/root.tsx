@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from '@remix-run/react';
 import type { LinksFunction, MetaFunction } from '@remix-run/node';
+import { Toaster } from '~/components/ui/toaster';
 
 import mainStylesheetUrl from './styles/main.css';
 import tailwindStylesheetUrl from './styles/tailwind.css';
@@ -32,6 +33,7 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <Toaster />
       </body>
     </html>
   );
