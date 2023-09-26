@@ -62,7 +62,14 @@ router.get('/:userId/last', async (req, res) => {
 
   const user = await db.user.findUnique({
     where: { id: userId },
-    include: { emails: true },
+    include: {
+      emails: {
+        take: 1,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+    },
   });
 
   if (!user) {
