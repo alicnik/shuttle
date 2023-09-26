@@ -70,6 +70,7 @@ export default function Index() {
         A temporary email service that minimises the back and forth
       </p>
       <img
+        height={150}
         width={150}
         className={clsx(
           'shuttle-logo cursor-pointer',
