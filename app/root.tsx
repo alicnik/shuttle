@@ -32,7 +32,7 @@ export default function App() {
         <Outlet />
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
+        {process.env.NODE_ENV !== 'production' && <LiveReload />}
         <Toaster />
       </body>
     </html>

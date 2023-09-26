@@ -1,4 +1,4 @@
-import { Form, Link, useSubmit } from '@remix-run/react';
+import { Form, Link, useSearchParams, useSubmit } from '@remix-run/react';
 import { format } from 'date-fns';
 import { Tooltip } from './Tooltip';
 import { Button, Separator } from './ui';
@@ -14,17 +14,16 @@ import { AlertDialogTrigger } from './ui/alert-dialog';
 interface EmailPreviewHeaderProps {
   email: Email;
   userId: User['id'];
-  setPreview: React.Dispatch<React.SetStateAction<string | null>>;
   setSelected: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export function EmailPreviewHeader({
   email,
   userId,
-  setPreview,
   setSelected,
 }: EmailPreviewHeaderProps) {
   const submit = useSubmit();
+  const [, setSearchParams] = useSearchParams();
 
   return (
     <div className="max-h-48 overflow-hidden p-4 text-zinc-900">
@@ -57,7 +56,10 @@ export function EmailPreviewHeader({
           title="Are you sure?"
           description="This action cannot be undone."
           onConfirm={() => {
-            setPreview(null);
+            setSearchParams((params) => {
+              params.delete('preview');
+              return params;
+            });
             setSelected((selected) => selected.filter((id) => id !== email.id));
             submit(
               { selected: email.id, _action: 'deleteSelected' },

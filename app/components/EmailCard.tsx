@@ -1,24 +1,16 @@
 import type { Email } from '@prisma/client';
 import { Checkbox } from '~/components/ui/checkbox';
-import { useNavigation, useSubmit } from '@remix-run/react';
+import { Form, useNavigation, useSearchParams } from '@remix-run/react';
 import { formatRelative } from 'date-fns';
 
 interface EmailCardProps {
   email: Email;
   selected: string[];
   setSelected: React.Dispatch<React.SetStateAction<string[]>>;
-  preview: string | null;
-  setPreview: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export function EmailCard({
-  email,
-  selected,
-  setSelected,
-  preview,
-  setPreview,
-}: EmailCardProps) {
-  const submit = useSubmit();
+export function EmailCard({ email, selected, setSelected }: EmailCardProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigation = useNavigation();
 
   const isOptimisticRead =
@@ -32,7 +24,7 @@ export function EmailCard({
     String(navigation.formData?.get('selected')).split(',').includes(email.id);
 
   const isSelected = selected.includes(email.id);
-  const isPreview = preview === email.id;
+  const isPreview = searchParams.get('preview') === email.id;
 
   const from = email.from.startsWith('<')
     ? email.from.slice(1, -1)
@@ -46,47 +38,45 @@ export function EmailCard({
     >
       <Checkbox
         className="mt-[2px]"
-        checked={isSelected || isPreview}
+        checked={isSelected}
         onCheckedChange={(checked) => {
           setSelected((selected) => {
             if (checked) {
               return [...selected, email.id];
             }
-
             if (isPreview) {
-              setPreview(null);
+              setSearchParams((params) => {
+                params.set('preview', selected[0]);
+                return params;
+              });
             }
             return selected.filter((id) => id !== email.id);
           });
         }}
       />
-      <div
-        data-read={!isOptimisticUnread && (email.read || isOptimisticRead)}
-        className="w-full cursor-pointer text-left data-[read=true]:opacity-50"
-        onClick={() => {
-          setPreview((currentPreview) => {
-            if (selected.length) {
-              setSelected([]);
-            }
-            if (currentPreview) {
-              submit(
-                { emailId: currentPreview, _action: 'markRead' },
-                { method: 'post' }
-              );
-            }
-            return email.id;
-          });
-        }}
-      >
-        <div className="mb-1 flex items-center ">
-          <p className="mr-12 w-max text-sm font-bold">{from}</p>
-          <p className="ml-auto w-max text-xs">
-            {formatRelative(email.createdAt, new Date())}
-          </p>
-        </div>
-        <p className="mb-1 max-w-[250px] truncate text-sm">{email.subject}</p>
-        <p className="line-clamp-2 max-w-[300px] text-xs">{email.text}</p>
-      </div>
+      <Form method="post">
+        <input type="hidden" name="emailId" value={email.id} />
+        <button
+          type="submit"
+          name="_action"
+          value="setPreview"
+          data-read={!isOptimisticUnread && (email.read || isOptimisticRead)}
+          className="w-full cursor-pointer text-left data-[read=true]:opacity-50"
+          onClick={() => {
+            console.log('click');
+            setSelected([]);
+          }}
+        >
+          <div className="mb-1 flex items-center ">
+            <p className="mr-12 w-max text-sm font-bold">{from}</p>
+            <p className="ml-auto w-max text-xs">
+              {formatRelative(email.createdAt, new Date())}
+            </p>
+          </div>
+          <p className="mb-1 max-w-[250px] truncate text-sm">{email.subject}</p>
+          <p className="line-clamp-2 max-w-[300px] text-xs">{email.text}</p>
+        </button>
+      </Form>
     </div>
   );
 }

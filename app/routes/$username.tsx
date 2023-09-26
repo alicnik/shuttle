@@ -5,9 +5,10 @@ import {
   useLoaderData,
   useNavigation,
   useRevalidator,
+  useSearchParams,
   useSubmit,
 } from '@remix-run/react';
-import { json } from '@remix-run/node';
+import { json, redirect } from '@remix-run/node';
 import invariant from 'tiny-invariant';
 import clsx from 'clsx';
 import { createUser, getUser } from '~/models/user.server';
@@ -64,6 +65,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const action = formData.get('_action');
   switch (action) {
+    case 'setPreview': {
+      const emailId = String(formData.get('emailId'));
+      const url = new URL(request.url);
+      const currentPreview = url.searchParams.get('preview');
+      if (currentPreview) {
+        await markEmailsAsRead(currentPreview);
+      }
+      url.searchParams.set('preview', emailId);
+      return redirect(url.href, { status: 303 });
+    }
     case 'markRead': {
       const emailId = String(formData.get('emailId'));
       await markEmailsAsRead(emailId);
@@ -84,6 +95,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const emailIds = String(formData.get('selected'));
       const emailIdsArray = emailIds.split(',');
       await deleteEmails(emailIdsArray);
+      const url = new URL(request.url);
+      const currentPreview = url.searchParams.get('preview');
+      if (currentPreview && emailIdsArray.includes(currentPreview)) {
+        url.searchParams.delete('preview');
+        return redirect(url.href, { status: 303 });
+      }
       return new Response(null, { status: 200 });
     }
     default:
@@ -104,13 +121,41 @@ export const meta: MetaFunction<typeof loader> = ({ params, data }) => {
 export default function UserInbox() {
   const submit = useSubmit();
   const navigation = useNavigation();
-  const [selected, setSelected] = React.useState<string[]>([]);
-  const [preview, setPreview] = React.useState<string | null>(null);
+  const revalidator = useRevalidator();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [selectedState, setSelected] = React.useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = React.useState('');
   const [isRevalidating, setIsRevalidating] = React.useState(false);
 
-  const [searchTerm, setSearchTerm] = React.useState('');
   const { user } = useLoaderData<typeof loader>();
-  const revalidator = useRevalidator();
+
+  const emailsBeingDeleted =
+    navigation.formData?.get('_action') === 'deleteSelected'
+      ? String(navigation.formData?.get('selected')).split(',')
+      : [];
+  const newPreview =
+    navigation.formData?.get('_action') === 'setPreview'
+      ? String(navigation.formData?.get('emailId'))
+      : null;
+
+  const emailsToDisplay = user.emails
+    .filter(({ id }) => !emailsBeingDeleted.includes(id))
+    .filter(
+      ({ subject, text }) =>
+        subject?.toLowerCase().includes(searchTerm) ||
+        text?.toLowerCase().includes(searchTerm)
+    )
+    .map((email) => ({ ...email, createdAt: new Date(email.createdAt) }));
+
+  const preview = searchParams.get('preview');
+  const previewEmail = user.emails.find(({ id }) =>
+    [preview, newPreview].includes(id)
+  );
+
+  const selected = selectedState.concat(
+    newPreview || searchParams.get('preview') || []
+  );
 
   React.useEffect(() => {
     const intervalId = setInterval(revalidator.revalidate, 30000);
@@ -144,37 +189,6 @@ export default function UserInbox() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const emailsBeingDeleted = React.useMemo(() => {
-    const isInFlight = ['submitting', 'loading'].includes(navigation.state);
-    if (!isInFlight) {
-      return [];
-    }
-
-    const formData = navigation.formData;
-    if (!formData) {
-      return [];
-    }
-
-    const action = formData.get('_action');
-    if (action !== 'deleteSelected') {
-      return [];
-    }
-
-    const selected = String(formData.get('selected')).split(',');
-    return selected;
-  }, [navigation]);
-
-  const emailsToDisplay = user.emails
-    .filter(({ id }) => !emailsBeingDeleted.includes(id))
-    .filter(
-      ({ subject, text }) =>
-        subject?.toLowerCase().includes(searchTerm) ||
-        text?.toLowerCase().includes(searchTerm)
-    )
-    .map((email) => ({ ...email, createdAt: new Date(email.createdAt) }));
-
-  const previewEmail = user.emails.find(({ id }) => id === preview);
-
   return (
     <>
       <div className="container mx-auto flex h-full w-full gap-6 rounded-md p-4">
@@ -201,83 +215,95 @@ export default function UserInbox() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           {emailsToDisplay.length ? (
-            <Form method="post" className="h-full">
-              <input type="hidden" name="selected" value={selected.join(',')} />
-              <div className="mb-6 flex gap-4">
-                <Checkbox
-                  className="ml-2 mr-2 mt-[10px]"
-                  checked={emailsToDisplay.every(({ id }) =>
-                    selected.includes(id)
-                  )}
-                  onCheckedChange={() => {
-                    setSelected((selected) => {
-                      if (selected.length === emailsToDisplay.length) {
-                        if (preview) {
-                          setPreview(null);
-                        }
-                        return [];
-                      }
-                      return emailsToDisplay.map(({ id }) => id);
-                    });
-                  }}
+            <div className="h-full">
+              <Form method="post">
+                <input
+                  type="hidden"
+                  name="selected"
+                  value={selected.join(',')}
                 />
-                <Tooltip content="Mark as unread">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    name="_action"
-                    value="markSelectedUnread"
-                  >
-                    <EnvelopeClosedIcon />
-                  </Button>
-                </Tooltip>
-                <AlertDialog
-                  title="Are you sure?"
-                  description="This action cannot be undone."
-                  onConfirm={() => {
-                    setSelected([]);
-                    setPreview(
-                      preview && selected.includes(preview) ? null : preview
-                    );
-                    submit(
-                      {
-                        _action: 'deleteSelected',
-                        selected: selected.join(','),
-                      },
-                      { method: 'post' }
-                    );
-                  }}
-                >
-                  <Tooltip content="Delete">
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        type="button"
-                        name="_action"
-                        value="deleteSelected"
-                        variant="outline"
-                        className="hover:bg-destructive focus:bg-destructive"
-                        size="icon"
-                      >
-                        <TrashIcon />
-                      </Button>
-                    </AlertDialogTrigger>
+                <div className="mb-6 flex gap-4">
+                  <Checkbox
+                    className="ml-2 mr-2 mt-[10px]"
+                    checked={emailsToDisplay.every(({ id }) =>
+                      selected.includes(id)
+                    )}
+                    onCheckedChange={() => {
+                      setSelected((selected) => {
+                        if (selected.length === emailsToDisplay.length) {
+                          if (preview) {
+                            setSearchParams((params) => {
+                              params.delete('preview');
+                              return params;
+                            });
+                          }
+                          return [];
+                        }
+                        return emailsToDisplay.map(({ id }) => id);
+                      });
+                    }}
+                  />
+                  <Tooltip content="Mark as unread">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      name="_action"
+                      value="markSelectedUnread"
+                    >
+                      <EnvelopeClosedIcon />
+                    </Button>
                   </Tooltip>
-                </AlertDialog>
-                <Tooltip content="Check for new emails">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    type="button"
-                    onClick={() => {
-                      revalidator.revalidate();
+                  <AlertDialog
+                    title="Are you sure?"
+                    description="This action cannot be undone."
+                    onConfirm={() => {
+                      setSelected([]);
+                      setSearchParams((params) => {
+                        if (preview && selected.includes(preview)) {
+                          params.delete('preview');
+                        }
+                        return params;
+                      });
+                      submit(
+                        {
+                          _action: 'deleteSelected',
+                          selected: selected.join(','),
+                        },
+                        { method: 'post' }
+                      );
                     }}
                   >
-                    <UpdateIcon
-                      className={clsx(isRevalidating && 'animate-spin')}
-                    />
-                  </Button>
-                </Tooltip>
-              </div>
+                    <Tooltip content="Delete">
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          type="button"
+                          name="_action"
+                          value="deleteSelected"
+                          variant="outline"
+                          className="hover:bg-destructive focus:bg-destructive"
+                          size="icon"
+                        >
+                          <TrashIcon />
+                        </Button>
+                      </AlertDialogTrigger>
+                    </Tooltip>
+                  </AlertDialog>
+                  <Tooltip content="Check for new emails">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      type="button"
+                      onClick={() => {
+                        revalidator.revalidate();
+                      }}
+                    >
+                      <UpdateIcon
+                        className={clsx(isRevalidating && 'animate-spin')}
+                      />
+                    </Button>
+                  </Tooltip>
+                </div>
+              </Form>
               <div className="email-list h-full overflow-y-auto">
                 {emailsToDisplay.map((email, index) => {
                   return (
@@ -286,8 +312,6 @@ export default function UserInbox() {
                         email={email}
                         selected={selected}
                         setSelected={setSelected}
-                        preview={preview}
-                        setPreview={setPreview}
                       />
                       {index !== emailsToDisplay.length - 1 && (
                         <Separator className="mb-4" />
@@ -296,7 +320,7 @@ export default function UserInbox() {
                   );
                 })}
               </div>
-            </Form>
+            </div>
           ) : (
             <p className="text-sm italic">
               {searchTerm ? `No results...` : 'No emails in here...'}
@@ -311,7 +335,6 @@ export default function UserInbox() {
                 createdAt: new Date(previewEmail.createdAt),
               }}
               userId={user.id}
-              setPreview={setPreview}
               setSelected={setSelected}
             />
           ) : null}
