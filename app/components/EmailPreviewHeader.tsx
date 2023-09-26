@@ -1,4 +1,5 @@
-import { Form, Link, useSubmit } from '@remix-run/react';
+import * as React from 'react';
+import { Form, Link, useSearchParams, useSubmit } from '@remix-run/react';
 import { format } from 'date-fns';
 import { Tooltip } from './Tooltip';
 import { Button, Separator } from './ui';
@@ -6,25 +7,46 @@ import type { Email, User } from '@prisma/client';
 import {
   EnvelopeClosedIcon,
   ExternalLinkIcon,
+  Link2Icon,
   TrashIcon,
 } from '@radix-ui/react-icons';
 import { AlertDialog } from './AlertDialog';
 import { AlertDialogTrigger } from './ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '~/components/ui/dialog';
+import { LINK_COPY_SUCCESS_MESSAGE } from '~/lib';
+import { useToast } from './ui/use-toast';
 
 interface EmailPreviewHeaderProps {
   email: Email;
   userId: User['id'];
-  setPreview: React.Dispatch<React.SetStateAction<string | null>>;
   setSelected: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export function EmailPreviewHeader({
   email,
   userId,
-  setPreview,
   setSelected,
 }: EmailPreviewHeaderProps) {
+  const { toast } = useToast();
   const submit = useSubmit();
+  const [, setSearchParams] = useSearchParams();
+
+  const links = React.useMemo(() => {
+    if (typeof window === 'undefined') {
+      return [];
+    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(email.html, 'text/html');
+    const links = Array.from(doc.querySelectorAll('a'));
+    return links;
+  }, [email.html]);
 
   return (
     <div className="max-h-48 overflow-hidden p-4 text-zinc-900">
@@ -57,7 +79,10 @@ export function EmailPreviewHeader({
           title="Are you sure?"
           description="This action cannot be undone."
           onConfirm={() => {
-            setPreview(null);
+            setSearchParams((params) => {
+              params.delete('preview');
+              return params;
+            });
             setSelected((selected) => selected.filter((id) => id !== email.id));
             submit(
               { selected: email.id, _action: 'deleteSelected' },
@@ -72,7 +97,7 @@ export function EmailPreviewHeader({
                 value="deleteSelected"
                 variant="ghost"
                 size="icon"
-                className="hover:bg-destructive focus:bg-destructive"
+                className="hover:bg-destructive"
               >
                 <TrashIcon />
               </Button>
@@ -96,6 +121,54 @@ export function EmailPreviewHeader({
             </Button>
           </Link>
         </Tooltip>
+
+        <Dialog>
+          <Tooltip content="Harvest links">
+            <DialogTrigger>
+              <Button variant="ghost" type="button" size="icon">
+                <Link2Icon />
+              </Button>
+            </DialogTrigger>
+          </Tooltip>
+          <DialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
+            <DialogHeader>
+              <DialogTitle>Found the following links in the email</DialogTitle>
+              <DialogDescription>
+                Click a link to copy it to your clipboard
+              </DialogDescription>
+              {links.length > 0 ? (
+                <div className="grid auto-rows-fr grid-cols-2 grid-rows-6 place-items-center gap-4 pt-8">
+                  {links.map((link) => {
+                    return (
+                      <Tooltip
+                        key={link.href}
+                        content={link.href}
+                        sideOffset={4}
+                      >
+                        <div
+                          className="cursor-pointer text-center"
+                          dangerouslySetInnerHTML={{
+                            __html: link.innerHTML,
+                          }}
+                          onClick={async () => {
+                            await navigator.clipboard.writeText(link.href);
+                            toast({
+                              description: LINK_COPY_SUCCESS_MESSAGE,
+                            });
+                          }}
+                        />
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              ) : (
+                <DialogDescription>
+                  No links were found in the email
+                </DialogDescription>
+              )}
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </Form>
       <Separator />
     </div>
