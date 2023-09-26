@@ -59,7 +59,9 @@ export default function Index() {
   const actionData = useActionData<typeof action>();
 
   const [isAnimating, setIsAnimating] = React.useState(false);
-  const isSubmitting = ['submitting', 'loading'].includes(navigation.state);
+  const isSubmitting =
+    ['submitting', 'loading'].includes(navigation.state) &&
+    !!navigation.formData;
 
   return (
     <div className="flex flex-col items-center">

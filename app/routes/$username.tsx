@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   Form,
+  Link,
   useLoaderData,
   useNavigation,
   useRevalidator,
@@ -179,7 +180,9 @@ export default function UserInbox() {
       <div className="container mx-auto flex h-full w-full gap-6 rounded-md p-4">
         <div className="w-96 rounded-md">
           <div className="mb-8 flex items-baseline justify-between gap-3">
-            <h1 className="flex-1 text-3xl font-bold">Inbox</h1>
+            <Link to="/" className="flex-1">
+              <h1 className=" text-3xl font-bold">Shuttle</h1>
+            </Link>
             <span className="text-sm">{user.id}@shuttle.email </span>
             <CopyToClipboard
               copyText={`${user.id}@shuttle.email`}
