@@ -7,7 +7,7 @@ import {
 } from '~/components/ui/tooltip';
 import type { TooltipContentProps } from '@radix-ui/react-tooltip';
 
-interface TooltipProps {
+export interface TooltipProps {
   content: string;
   children: React.ReactNode;
   side?: TooltipContentProps['side'];

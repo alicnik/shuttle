@@ -1,12 +1,34 @@
 import * as React from 'react';
 import { json, redirect } from '@remix-run/node';
-import { Form, useActionData, useNavigation } from '@remix-run/react';
+import {
+  Form,
+  Link,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from '@remix-run/react';
 import clsx from 'clsx';
 import invariant from 'tiny-invariant';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { Button, Input } from '~/components/ui';
 import { createUser } from '~/models/user.server';
-import type { ActionFunctionArgs } from '@remix-run/node';
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { getInboxes, syncSession } from '~/lib/session.server';
+import { CopyToClipboard } from '~/components';
+import { EMAIL_ADRESS_COPY_SUCCESS_MESSAGE } from '~/lib';
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const inboxes = await getInboxes(request);
+
+  return json(
+    { inboxes },
+    {
+      headers: {
+        'Set-Cookie': await syncSession(request),
+      },
+    }
+  );
+};
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
@@ -14,16 +36,29 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   invariant(typeof username === 'string', 'username must be a string');
   const user = await createUser(username);
   if (!user) {
-    return json({ errors: 'Username already taken.' }, { status: 400 });
+    return json(
+      { errors: 'Username already taken.' },
+      {
+        headers: {
+          'Set-Cookie': await syncSession(request),
+        },
+        status: 400,
+      }
+    );
   }
-  return redirect(`/${user.id}`);
+  return redirect(`/${user.id}`, {
+    headers: {
+      'Set-Cookie': await syncSession(request, user.id),
+    },
+  });
 };
 
 export default function Index() {
   const navigation = useNavigation();
+  const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const [isAnimating, setIsAnimating] = React.useState(false);
 
+  const [isAnimating, setIsAnimating] = React.useState(false);
   const isSubmitting = ['submitting', 'loading'].includes(navigation.state);
 
   return (
@@ -49,7 +84,10 @@ export default function Index() {
           }, 1250);
         }}
       />
-      <Form method="post" className="w-full max-w-md">
+      <Form method="post" className="mb-8 w-full max-w-md">
+        <p className="mb-4 w-full text-center">
+          Create an inbox. It will be deleted at midnight.
+        </p>
         <div className="mb-1 flex items-center space-x-2">
           <Input
             type="text"
@@ -66,12 +104,36 @@ export default function Index() {
             )}
           </Button>
         </div>
-        {actionData?.errors && (
+        {actionData?.errors ? (
           <p role="alert" className="ml-2 text-xs text-red-500">
             {actionData?.errors}
           </p>
+        ) : (
+          <>&nbsp;</>
         )}
       </Form>
+
+      {loaderData.inboxes?.length ? (
+        <div className="flex justify-center gap-12">
+          <h2 className="text-2xl font-bold">Your Inboxes</h2>
+          <ul className="flex flex-col space-y-2 pt-2">
+            {loaderData?.inboxes?.map(({ username }) => (
+              <li key={username} className="flex gap-2">
+                <Link to={`/${username}`} className="text-sm underline">
+                  {username}@shuttle.email
+                </Link>
+                <CopyToClipboard
+                  copyText={`${username}@shuttle.email`}
+                  successMessage={EMAIL_ADRESS_COPY_SUCCESS_MESSAGE}
+                  tooltipOptions={{
+                    content: 'Copy email address',
+                  }}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }

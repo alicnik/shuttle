@@ -13,13 +13,13 @@ import { createUser, getUser } from '~/models/user.server';
 import { Input, Separator, Button, Checkbox } from '~/components/ui';
 import {
   AlertDialog,
+  CopyToClipboard,
   EmailCard,
   EmailPreviewBody,
   EmailPreviewHeader,
   Tooltip,
 } from '~/components';
 import {
-  ClipboardCopyIcon,
   EnvelopeClosedIcon,
   TrashIcon,
   UpdateIcon,
@@ -35,9 +35,10 @@ import type {
   LoaderFunctionArgs,
   MetaFunction,
 } from '@remix-run/node';
-import { useToast } from '~/components/ui/use-toast';
+import { syncSession } from '~/lib/session.server';
+import { EMAIL_ADRESS_COPY_SUCCESS_MESSAGE } from '~/lib';
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { username } = params;
   invariant(username, 'Username is required');
   let user = await getUser(username);
@@ -47,7 +48,15 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   }
 
   invariant(user, 'User must exist');
-  return json({ user });
+
+  return json(
+    { user },
+    {
+      headers: {
+        'Set-Cookie': await syncSession(request, user.id),
+      },
+    }
+  );
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -92,7 +101,6 @@ export const meta: MetaFunction<typeof loader> = ({ params, data }) => {
 };
 
 export default function UserInbox() {
-  const { toast } = useToast();
   const submit = useSubmit();
   const navigation = useNavigation();
   const [selected, setSelected] = React.useState<string[]>([]);
@@ -173,19 +181,15 @@ export default function UserInbox() {
           <div className="mb-8 flex items-baseline justify-between gap-3">
             <h1 className="flex-1 text-3xl font-bold">Inbox</h1>
             <span className="text-sm">{user.id}@shuttle.email </span>
-            <Tooltip content="Copy email address" side="bottom" sideOffset={8}>
-              <ClipboardCopyIcon
-                className="translate-y-[3px] cursor-pointer"
-                onClick={async () => {
-                  await navigator.clipboard.writeText(
-                    `${user.id}@shuttle.email`
-                  );
-                  toast({
-                    description: 'Email address copied to clipboard.',
-                  });
-                }}
-              />
-            </Tooltip>
+            <CopyToClipboard
+              copyText={`${user.id}@shuttle.email`}
+              successMessage={EMAIL_ADRESS_COPY_SUCCESS_MESSAGE}
+              tooltipOptions={{
+                content: 'Copy email address',
+                side: 'bottom',
+                sideOffset: 8,
+              }}
+            />
           </div>
           <Input
             className="mb-6"
