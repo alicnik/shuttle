@@ -24,7 +24,7 @@ export function AlertDialog({
   return (
     <AlertDialogComponent>
       {children}
-      <AlertDialogContent>
+      <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>

@@ -54,7 +54,7 @@ export function EmailCard({ email, selected, setSelected }: EmailCardProps) {
           });
         }}
       />
-      <Form method="post">
+      <Form method="post" className="w-full">
         <input type="hidden" name="emailId" value={email.id} />
         <button
           type="submit"

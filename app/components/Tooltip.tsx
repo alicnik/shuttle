@@ -23,8 +23,12 @@ export function Tooltip({
     <TooltipProvider>
       <TooltipComponent>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent side={side} sideOffset={sideOffset}>
-          <p>{content}</p>
+        <TooltipContent
+          className="max-w-lg break-words"
+          side={side}
+          sideOffset={sideOffset}
+        >
+          {content}
         </TooltipContent>
       </TooltipComponent>
     </TooltipProvider>

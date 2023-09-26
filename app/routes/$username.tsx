@@ -280,7 +280,7 @@ export default function UserInbox() {
                           name="_action"
                           value="deleteSelected"
                           variant="outline"
-                          className="hover:bg-destructive focus:bg-destructive"
+                          className="hover:bg-destructive"
                           size="icon"
                         >
                           <TrashIcon />
