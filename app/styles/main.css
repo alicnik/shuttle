@@ -2,17 +2,6 @@
   max-height: calc(100% - 192px);
 }
 
-.email-preview::-webkit-scrollbar {
-  width:10px;
-  background: transparent;
-}
-
-.email-preview::-webkit-scrollbar-thumb {
-  background: rgb(24 24 27 / 0.9);
-  border-radius: 9999px;
-  border: 2px solid rgb(228 228 231);
-}
-
 .email-list {
   max-height: calc(100% - 188px);
 }

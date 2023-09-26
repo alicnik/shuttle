@@ -303,7 +303,7 @@ export default function UserInbox() {
             </p>
           )}
         </div>
-        <div className="flex-1 rounded-md bg-zinc-200">
+        <div className="flex-1 overflow-hidden rounded-md bg-zinc-200">
           {previewEmail ? (
             <EmailPreviewHeader
               email={{
