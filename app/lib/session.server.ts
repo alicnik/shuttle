@@ -1,5 +1,9 @@
 import { createCookieSessionStorage } from '@remix-run/node';
 
+if (!process.env.SESSION_SECRET) {
+  throw new Error('Session secret not defined');
+}
+
 const { getSession, commitSession } = createCookieSessionStorage<{
   inboxes: SessionInbox[];
 }>({
