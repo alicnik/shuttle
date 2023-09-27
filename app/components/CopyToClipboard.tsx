@@ -1,5 +1,5 @@
 import { ClipboardCopyIcon } from '@radix-ui/react-icons';
-import { useToast } from './ui/use-toast';
+import { useToast } from './ui';
 import { Tooltip } from './Tooltip';
 import type { TooltipProps } from './Tooltip';
 

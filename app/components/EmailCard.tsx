@@ -1,7 +1,7 @@
-import type { Email } from '@prisma/client';
-import { Checkbox } from '~/components/ui/checkbox';
 import { Form, useNavigation, useSearchParams } from '@remix-run/react';
 import { formatRelative } from 'date-fns';
+import { Checkbox } from './ui';
+import type { Email } from '@prisma/client';
 
 interface EmailCardProps {
   email: Email;

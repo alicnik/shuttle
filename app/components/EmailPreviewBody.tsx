@@ -1,5 +1,5 @@
-import type { Email } from '@prisma/client';
 import clsx from 'clsx';
+import type { Email } from '@prisma/client';
 
 export function EmailPreviewBody({ html }: { html?: Email['html'] }) {
   return (
