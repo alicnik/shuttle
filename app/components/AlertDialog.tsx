@@ -7,7 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '~/components/ui/alert-dialog';
+} from './ui';
 
 type AlertDialogProps = React.PropsWithChildren<{
   title: string;
