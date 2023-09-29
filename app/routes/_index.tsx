@@ -107,12 +107,8 @@ export default function Index() {
   const actionData = useActionData<typeof action>();
 
   const [isAnimating, setIsAnimating] = React.useState(false);
-  const isCreating =
-    ['submitting', 'loading'].includes(navigation.state) &&
-    navigation.formData?.get('_action') === 'create';
-  const isRandomising =
-    ['submitting', 'loading'].includes(navigation.state) &&
-    navigation.formData?.get('_action') === 'random';
+  const isCreating = navigation.formData?.get('_action') === 'create';
+  const isRandomising = navigation.formData?.get('_action') === 'random';
 
   return (
     <div className="container mx-auto flex flex-col items-center">
@@ -152,7 +148,7 @@ export default function Index() {
           placeholder="Email"
           append="@shuttle.email"
           name="username"
-          className="mb-4"
+          className="mb-2"
           defaultValue={
             actionData?.errors
               ? ''
@@ -161,7 +157,14 @@ export default function Index() {
               : undefined
           }
         />
-        <div className="flex justify-center gap-2">
+        {actionData?.errors ? (
+          <p role="alert" className="mb-2 ml-2 text-xs text-red-500">
+            {actionData?.errors}
+          </p>
+        ) : (
+          <>&nbsp;</>
+        )}
+        <div className="flex justify-center gap-4">
           <Button
             type="submit"
             name="_action"
@@ -175,7 +178,13 @@ export default function Index() {
               'Random'
             )}
           </Button>
-          <Button type="submit" disabled={isCreating} className="w-24">
+          <Button
+            type="submit"
+            disabled={isCreating}
+            className="w-24"
+            name="_action"
+            value="create"
+          >
             {isCreating ? (
               <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
             ) : (
@@ -183,13 +192,6 @@ export default function Index() {
             )}
           </Button>
         </div>
-        {actionData?.errors ? (
-          <p role="alert" className="mb-2 ml-2 text-xs text-red-500">
-            {actionData?.errors}
-          </p>
-        ) : (
-          <>&nbsp;</>
-        )}
       </Form>
 
       {loaderData.inboxes?.length ? (

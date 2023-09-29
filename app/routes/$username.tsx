@@ -197,7 +197,15 @@ export default function UserInbox() {
             <Link to="/" className="flex-1">
               <h1 className="text-3xl font-bold">Shuttle</h1>
             </Link>
-            <span className="text-sm">{user.id}@shuttle.email </span>
+            <Tooltip
+              content={`${user.id}@shuttle.email`}
+              side="bottom"
+              sideOffset={8}
+            >
+              <span className="w-min max-w-[150px] truncate text-right text-sm lg:max-w-[200px]">
+                {user.id}@shuttle.email
+              </span>
+            </Tooltip>
             <CopyToClipboard
               copyText={`${user.id}@shuttle.email`}
               successMessage={EMAIL_ADRESS_COPY_SUCCESS_MESSAGE}
