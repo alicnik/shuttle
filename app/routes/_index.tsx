@@ -64,9 +64,9 @@ export default function Index() {
     !!navigation.formData;
 
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="mt-16 text-8xl font-bold">Shuttle</h1>
-      <p className="text-lg">
+    <div className="container mx-auto flex flex-col items-center">
+      <h1 className="mt-8 text-8xl font-bold md:mt-16">Shuttle</h1>
+      <p className="text-center text-lg">
         A temporary email service that minimises the back and forth
       </p>
       <img
@@ -87,11 +87,14 @@ export default function Index() {
           }, 1250);
         }}
       />
-      <Form method="post" className="mb-8 w-full max-w-md">
+      <Form
+        method="post"
+        className="relative -top-8 mb-4 w-full max-w-md md:mb-8"
+      >
         <p className="mb-4 w-full text-center">
           Create an inbox. It will be deleted at midnight.
         </p>
-        <div className="mb-1 flex items-center space-x-2">
+        <div className="mx-auto mb-1 flex max-w-sm flex-col items-center gap-4 space-x-2 md:flex-row">
           <Input
             type="text"
             placeholder="Email"
@@ -117,12 +120,18 @@ export default function Index() {
       </Form>
 
       {loaderData.inboxes?.length ? (
-        <div className="flex justify-center gap-12">
-          <h2 className="text-2xl font-bold">Your Inboxes</h2>
+        <div className="relative -top-8 flex flex-col md:flex-row md:justify-center md:gap-12">
+          <h2 className="mb-2 text-center text-2xl font-bold">Your Inboxes</h2>
           <ul className="flex flex-col space-y-2 pt-2">
             {loaderData?.inboxes?.map(({ username }) => (
-              <li key={username} className="flex gap-2">
-                <Link to={`/${username}`} className="text-sm underline">
+              <li
+                key={username}
+                className="flex justify-between gap-2 md:justify-normal"
+              >
+                <Link
+                  to={`/${username}`}
+                  className="max-w-[190px] truncate text-sm underline"
+                >
                   {username}@shuttle.email
                 </Link>
                 <CopyToClipboard
