@@ -195,7 +195,7 @@ export default function Index() {
               >
                 <Link
                   to={`/${username}`}
-                  className="max-w-[190px] truncate text-sm underline"
+                  className="max-w-[190px] truncate text-sm underline md:max-w-[230px]"
                 >
                   {username}@shuttle.email
                 </Link>
