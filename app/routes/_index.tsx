@@ -12,10 +12,15 @@ import invariant from 'tiny-invariant';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { Button, Input } from '~/components/ui';
 import { createUser } from '~/models/user.server';
-import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { getInboxes, syncSession } from '~/lib/session.server';
 import { CopyToClipboard } from '~/components';
 import { EMAIL_ADRESS_COPY_SUCCESS_MESSAGE } from '~/lib';
+import type {
+  ActionFunctionArgs,
+  LinksFunction,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from '@remix-run/node';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const inboxes = await getInboxes(request);
@@ -53,6 +58,29 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   });
 };
 
+export const meta: MetaFunction = () => [
+  {
+    title: 'Shuttle',
+  },
+  {
+    name: 'description',
+    content: 'A temporary email service that minimises the back and forth.',
+  },
+];
+
+export const links: LinksFunction = () => [
+  {
+    rel: 'preconnect',
+    href: 'https://fonts.gstatic.com',
+    crossOrigin: 'anonymous',
+  },
+  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+  {
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap',
+  },
+];
+
 export default function Index() {
   const navigation = useNavigation();
   const loaderData = useLoaderData<typeof loader>();
@@ -65,7 +93,9 @@ export default function Index() {
 
   return (
     <div className="container mx-auto flex flex-col items-center">
-      <h1 className="mt-8 text-8xl font-bold md:mt-16">Shuttle</h1>
+      <h1 className="mb-2 mt-8 font-display text-6xl font-bold md:mt-16 md:text-8xl">
+        Shuttle
+      </h1>
       <p className="text-center text-lg">
         A temporary email service that minimises the back and forth
       </p>

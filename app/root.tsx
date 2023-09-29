@@ -6,15 +6,14 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react';
-import type { LinksFunction, MetaFunction } from '@remix-run/node';
 import { Toaster } from '~/components/ui/toaster';
+import type { LinksFunction } from '@remix-run/node';
 
 import mainStylesheetUrl from './styles/main.css';
 import tailwindStylesheetUrl from './styles/tailwind.css';
 
-export const meta: MetaFunction = () => [{ title: 'Shuttle' }];
-
 export const links: LinksFunction = () => [
+  { rel: 'icon', href: 'favicon.png' },
   { rel: 'stylesheet', href: mainStylesheetUrl },
   { rel: 'stylesheet', href: tailwindStylesheetUrl },
 ];
