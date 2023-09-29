@@ -1,6 +1,6 @@
 # Shuttle
 
-Email testing app, basically a super-simple Putsbox without a UI.
+An email testing app that offers a UI and an API for processing inbound emails to any username.
 
 ## Stack
 
