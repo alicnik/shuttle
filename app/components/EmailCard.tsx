@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Form, Link, useNavigation, useSearchParams } from '@remix-run/react';
 import { Checkbox } from './ui';
 import type { Email } from '@prisma/client';
