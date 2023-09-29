@@ -48,7 +48,7 @@ export function HarvestLinks({ email }: HarvestLinksProps) {
   return (
     <Dialog>
       <Tooltip content="Harvest links">
-        <DialogTrigger>
+        <DialogTrigger asChild>
           <Button variant="ghost" type="button" size="icon">
             <Link2Icon />
           </Button>

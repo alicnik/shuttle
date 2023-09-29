@@ -192,10 +192,10 @@ export default function UserInbox() {
   return (
     <>
       <div className="container mx-auto flex h-full w-full gap-6 rounded-md p-4">
-        <div className="w-96 rounded-md">
+        <div className="w-full rounded-md md:w-80 lg:w-96">
           <div className="mb-8 flex items-baseline justify-between gap-3">
             <Link to="/" className="flex-1">
-              <h1 className=" text-3xl font-bold">Shuttle</h1>
+              <h1 className="text-3xl font-bold">Shuttle</h1>
             </Link>
             <span className="text-sm">{user.id}@shuttle.email </span>
             <CopyToClipboard
@@ -214,112 +214,107 @@ export default function UserInbox() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          {emailsToDisplay.length ? (
-            <div className="h-full">
-              <Form method="post">
-                <input
-                  type="hidden"
-                  name="selected"
-                  value={selected.join(',')}
-                />
-                <div className="mb-6 flex gap-4">
-                  <Checkbox
-                    className="ml-2 mr-2 mt-[10px]"
-                    checked={emailsToDisplay.every(({ id }) =>
-                      selected.includes(id)
-                    )}
-                    onCheckedChange={() => {
-                      setSelected((selected) => {
-                        if (selected.length === emailsToDisplay.length) {
-                          if (preview) {
-                            setSearchParams((params) => {
-                              params.delete('preview');
-                              return params;
-                            });
-                          }
-                          return [];
-                        }
-                        return emailsToDisplay.map(({ id }) => id);
-                      });
-                    }}
-                  />
-                  <Tooltip content="Mark as unread">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      name="_action"
-                      value="markSelectedUnread"
-                    >
-                      <EnvelopeClosedIcon />
-                    </Button>
-                  </Tooltip>
-                  <AlertDialog
-                    title="Are you sure?"
-                    description="This action cannot be undone."
-                    onConfirm={() => {
-                      setSelected([]);
-                      setSearchParams((params) => {
-                        if (preview && selected.includes(preview)) {
+          <Form method="post">
+            <input type="hidden" name="selected" value={selected.join(',')} />
+            <div className="mb-6 flex gap-4">
+              <Checkbox
+                className="ml-2 mr-2 mt-[10px]"
+                checked={
+                  emailsToDisplay.length > 0 &&
+                  emailsToDisplay.every(({ id }) => selected.includes(id))
+                }
+                onCheckedChange={() => {
+                  setSelected((selected) => {
+                    if (selected.length === emailsToDisplay.length) {
+                      if (preview) {
+                        setSearchParams((params) => {
                           params.delete('preview');
-                        }
-                        return params;
-                      });
-                      submit(
-                        {
-                          _action: 'deleteSelected',
-                          selected: selected.join(','),
-                        },
-                        { method: 'post' }
-                      );
-                    }}
-                  >
-                    <Tooltip content="Delete">
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          type="button"
-                          name="_action"
-                          value="deleteSelected"
-                          variant="outline"
-                          className="hover:bg-destructive"
-                          size="icon"
-                        >
-                          <TrashIcon />
-                        </Button>
-                      </AlertDialogTrigger>
-                    </Tooltip>
-                  </AlertDialog>
-                  <Tooltip content="Check for new emails">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      type="button"
-                      onClick={() => {
-                        revalidator.revalidate();
-                      }}
-                    >
-                      <UpdateIcon
-                        className={clsx(isRevalidating && 'animate-spin')}
-                      />
-                    </Button>
-                  </Tooltip>
-                </div>
-              </Form>
-              <div className="email-list h-full overflow-y-auto">
-                {emailsToDisplay.map((email, index) => {
-                  return (
-                    <React.Fragment key={email.id}>
-                      <EmailCard
-                        email={email}
-                        selected={selected}
-                        setSelected={setSelected}
-                      />
-                      {index !== emailsToDisplay.length - 1 && (
-                        <Separator className="mb-4" />
-                      )}
-                    </React.Fragment>
+                          return params;
+                        });
+                      }
+                      return [];
+                    }
+                    return emailsToDisplay.map(({ id }) => id);
+                  });
+                }}
+              />
+              <Tooltip content="Mark as unread">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  name="_action"
+                  value="markSelectedUnread"
+                >
+                  <EnvelopeClosedIcon />
+                </Button>
+              </Tooltip>
+              <AlertDialog
+                title="Are you sure?"
+                description="This action cannot be undone."
+                onConfirm={() => {
+                  setSelected([]);
+                  setSearchParams((params) => {
+                    if (preview && selected.includes(preview)) {
+                      params.delete('preview');
+                    }
+                    return params;
+                  });
+                  submit(
+                    {
+                      _action: 'deleteSelected',
+                      selected: selected.join(','),
+                    },
+                    { method: 'post' }
                   );
-                })}
-              </div>
+                }}
+              >
+                <Tooltip content="Delete">
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      type="button"
+                      name="_action"
+                      value="deleteSelected"
+                      variant="outline"
+                      className="hover:bg-destructive"
+                      size="icon"
+                    >
+                      <TrashIcon />
+                    </Button>
+                  </AlertDialogTrigger>
+                </Tooltip>
+              </AlertDialog>
+              <Tooltip content="Check for new emails">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  type="button"
+                  onClick={() => {
+                    revalidator.revalidate();
+                  }}
+                >
+                  <UpdateIcon
+                    className={clsx(isRevalidating && 'animate-spin')}
+                  />
+                </Button>
+              </Tooltip>
+            </div>
+          </Form>
+          {emailsToDisplay.length ? (
+            <div className="email-list h-full overflow-y-auto">
+              {emailsToDisplay.map((email, index) => {
+                return (
+                  <React.Fragment key={email.id}>
+                    <EmailCard
+                      email={email}
+                      selected={selected}
+                      setSelected={setSelected}
+                    />
+                    {index !== emailsToDisplay.length - 1 && (
+                      <Separator className="mb-4" />
+                    )}
+                  </React.Fragment>
+                );
+              })}
             </div>
           ) : (
             <p className="text-sm italic">
@@ -327,7 +322,7 @@ export default function UserInbox() {
             </p>
           )}
         </div>
-        <div className="flex-1 overflow-hidden rounded-md bg-zinc-200">
+        <div className="hidden flex-1 overflow-hidden rounded-md bg-zinc-200 md:block">
           {previewEmail ? (
             <EmailPreviewHeader
               email={{
