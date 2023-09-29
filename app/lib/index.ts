@@ -1,3 +1,4 @@
 export * from './cn';
-export * from './messages';
 export * from './format-date';
+export * from './generate-random-name';
+export * from './messages';
