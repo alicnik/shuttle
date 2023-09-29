@@ -14,7 +14,7 @@ import { Button, Input } from '~/components/ui';
 import { createUser } from '~/models/user.server';
 import { getInboxes, syncSession } from '~/lib/session.server';
 import { CopyToClipboard } from '~/components';
-import { EMAIL_ADRESS_COPY_SUCCESS_MESSAGE } from '~/lib';
+import { EMAIL_ADRESS_COPY_SUCCESS_MESSAGE, generateRandomName } from '~/lib';
 import type {
   ActionFunctionArgs,
   LinksFunction,
@@ -37,12 +37,31 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
+  const action = formData.get('_action');
+
+  const jsonData = {
+    errors: null,
+    randomName: null,
+  };
+
+  if (action === 'random') {
+    return json({ ...jsonData, randomName: generateRandomName() });
+  }
+
   const username = formData.get('username');
   invariant(typeof username === 'string', 'username must be a string');
+
+  if (!username) {
+    return json(
+      { ...jsonData, errors: 'Username cannot be empty.' },
+      { status: 400 }
+    );
+  }
+
   const user = await createUser(username);
   if (!user) {
     return json(
-      { errors: 'Username already taken.' },
+      { ...jsonData, errors: 'Username already taken.' },
       {
         headers: {
           'Set-Cookie': await syncSession(request),
@@ -51,6 +70,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }
     );
   }
+
   return redirect(`/${user.id}`, {
     headers: {
       'Set-Cookie': await syncSession(request, user.id),
@@ -87,9 +107,8 @@ export default function Index() {
   const actionData = useActionData<typeof action>();
 
   const [isAnimating, setIsAnimating] = React.useState(false);
-  const isSubmitting =
-    ['submitting', 'loading'].includes(navigation.state) &&
-    !!navigation.formData;
+  const isCreating = navigation.formData?.get('_action') === 'create';
+  const isRandomising = navigation.formData?.get('_action') === 'random';
 
   return (
     <div className="container mx-auto flex flex-col items-center">
@@ -119,34 +138,60 @@ export default function Index() {
       />
       <Form
         method="post"
-        className="relative -top-8 mb-4 w-full max-w-md md:mb-8"
+        className="relative -top-8 mb-4 w-full max-w-sm md:mb-8"
       >
         <p className="mb-4 w-full text-center">
           Create an inbox. It will be deleted at midnight.
         </p>
-        <div className="mx-auto mb-1 flex max-w-sm flex-col items-center gap-4 space-x-2 md:flex-row">
-          <Input
-            type="text"
-            placeholder="Email"
-            append="@shuttle.email"
-            name="username"
-            defaultValue={actionData?.errors ? '' : undefined}
-          />
-          <Button type="submit" className="w-24" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              'Create'
-            )}
-          </Button>
-        </div>
+        <Input
+          type="text"
+          placeholder="Email"
+          append="@shuttle.email"
+          name="username"
+          className="mb-2"
+          defaultValue={
+            actionData?.errors
+              ? ''
+              : actionData?.randomName
+              ? actionData?.randomName
+              : undefined
+          }
+        />
         {actionData?.errors ? (
-          <p role="alert" className="ml-2 text-xs text-red-500">
+          <p role="alert" className="mb-2 ml-2 text-xs text-red-500">
             {actionData?.errors}
           </p>
         ) : (
           <>&nbsp;</>
         )}
+        <div className="flex justify-center gap-4">
+          <Button
+            type="submit"
+            name="_action"
+            value="random"
+            className="w-24"
+            disabled={isRandomising}
+          >
+            {isRandomising ? (
+              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              'Random'
+            )}
+          </Button>
+          <Button
+            type="submit"
+            disabled={isCreating}
+            className="w-24"
+            name="_action"
+            value="create"
+          >
+            {isCreating ? (
+              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              'Submit'
+            )}
+          </Button>
+        </div>
       </Form>
 
       {loaderData.inboxes?.length ? (
@@ -160,7 +205,7 @@ export default function Index() {
               >
                 <Link
                   to={`/${username}`}
-                  className="max-w-[190px] truncate text-sm underline"
+                  className="max-w-[190px] truncate text-sm underline md:max-w-[230px]"
                 >
                   {username}@shuttle.email
                 </Link>
