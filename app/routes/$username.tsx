@@ -231,6 +231,7 @@ export default function UserInbox() {
                   emailsToDisplay.length > 0 &&
                   emailsToDisplay.every(({ id }) => selected.includes(id))
                 }
+                disabled={selected.length === 0}
                 onCheckedChange={() => {
                   setSelected((selected) => {
                     if (selected.length === emailsToDisplay.length) {
@@ -248,10 +249,12 @@ export default function UserInbox() {
               />
               <Tooltip content="Mark as unread">
                 <Button
+                  type="submit"
                   variant="outline"
                   size="icon"
                   name="_action"
                   value="markSelectedUnread"
+                  disabled={selected.length === 0}
                 >
                   <EnvelopeClosedIcon />
                 </Button>
@@ -285,6 +288,7 @@ export default function UserInbox() {
                       variant="outline"
                       className="hover:bg-destructive"
                       size="icon"
+                      disabled={selected.length === 0}
                     >
                       <TrashIcon />
                     </Button>
