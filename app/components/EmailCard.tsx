@@ -33,7 +33,7 @@ export function EmailCard({ email, selected, setSelected }: EmailCardProps) {
     <div
       data-selected={isSelected}
       data-in-view={isPreview}
-      className="mb-4 flex gap-2 rounded-md p-2 hover:bg-zinc-800 data-[in-view=true]:bg-zinc-800 data-[selected=true]:bg-zinc-800"
+      className="mb-4 flex gap-2 rounded-md p-2 hover:bg-zinc-200 data-[in-view=true]:bg-zinc-200 data-[selected=true]:bg-zinc-200 dark:hover:bg-zinc-800 dark:data-[in-view=true]:bg-zinc-800 dark:data-[selected=true]:bg-zinc-800"
     >
       <Checkbox
         className="mt-[2px]"

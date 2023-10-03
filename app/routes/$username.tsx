@@ -231,7 +231,7 @@ export default function UserInbox() {
                   emailsToDisplay.length > 0 &&
                   emailsToDisplay.every(({ id }) => selected.includes(id))
                 }
-                disabled={selected.length === 0}
+                disabled={emailsToDisplay.length === 0}
                 onCheckedChange={() => {
                   setSelected((selected) => {
                     if (selected.length === emailsToDisplay.length) {
@@ -334,7 +334,7 @@ export default function UserInbox() {
             </p>
           )}
         </div>
-        <div className="hidden flex-1 overflow-hidden rounded-md bg-zinc-200 md:block">
+        <div className="hidden flex-1 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-200 md:block">
           {previewEmail ? (
             <EmailPreviewHeader
               email={{
