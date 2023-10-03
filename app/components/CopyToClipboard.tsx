@@ -22,9 +22,7 @@ export function CopyToClipboard({
         className="translate-y-[3px] cursor-pointer"
         onClick={async () => {
           await navigator.clipboard.writeText(copyText);
-          toast({
-            description: successMessage,
-          });
+          toast({ description: successMessage });
         }}
       />
     </Tooltip>

@@ -10,11 +10,11 @@ import {
 import clsx from 'clsx';
 import invariant from 'tiny-invariant';
 import { ReloadIcon } from '@radix-ui/react-icons';
-import { Button, Input } from '~/components/ui';
+import { Button, CopyToClipboard, Input } from '~/components';
 import { createUser } from '~/models/user.server';
 import { getInboxes, syncSession } from '~/lib/session.server';
-import { CopyToClipboard } from '~/components';
-import { EMAIL_ADRESS_COPY_SUCCESS_MESSAGE, generateRandomName } from '~/lib';
+import { EMAIL_ADRESS_COPY_SUCCESS_MESSAGE } from '~/lib';
+import { generateRandomName } from '~/lib/generate-random-name.server';
 import type {
   ActionFunctionArgs,
   LinksFunction,

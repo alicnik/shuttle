@@ -9,8 +9,7 @@ import {
   ExternalLinkIcon,
   TrashIcon,
 } from '@radix-ui/react-icons';
-import { AlertDialog } from './AlertDialog';
-import { AlertDialogTrigger } from './ui/alert-dialog';
+import { AlertDialog, AlertDialogTrigger } from './AlertDialog';
 import { HarvestLinks } from './HarvestLinks';
 
 interface EmailPreviewHeaderProps {

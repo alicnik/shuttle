@@ -1,8 +1,8 @@
 import { redirect } from '@remix-run/node';
 import invariant from 'tiny-invariant';
 import { getEmail } from '~/models/email.server';
-import type { LoaderFunctionArgs } from '@remix-run/node';
 import { syncSession } from '~/lib/session.server';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { username, emailId } = params;

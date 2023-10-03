@@ -1,8 +1,9 @@
+import clsx from 'clsx';
 import { Form, Link, useNavigation, useSearchParams } from '@remix-run/react';
 import { Checkbox } from './ui';
-import type { Email } from '@prisma/client';
 import { useViewportSize } from '~/hooks';
 import { formatDate } from '~/lib';
+import type { Email } from '@prisma/client';
 
 interface EmailCardProps {
   email: Email;
@@ -33,7 +34,11 @@ export function EmailCard({ email, selected, setSelected }: EmailCardProps) {
     <div
       data-selected={isSelected}
       data-in-view={isPreview}
-      className="mb-4 flex gap-2 rounded-md p-2 hover:bg-zinc-200 data-[in-view=true]:bg-zinc-200 data-[selected=true]:bg-zinc-200 dark:hover:bg-zinc-800 dark:data-[in-view=true]:bg-zinc-800 dark:data-[selected=true]:bg-zinc-800"
+      className={clsx(
+        'mb-4 flex gap-2 rounded-md p-2',
+        'hover:bg-zinc-200 data-[in-view=true]:bg-zinc-200 data-[selected=true]:bg-zinc-200',
+        'dark:hover:bg-zinc-800 dark:data-[in-view=true]:bg-zinc-800 dark:data-[selected=true]:bg-zinc-800'
+      )}
     >
       <Checkbox
         className="mt-[2px]"

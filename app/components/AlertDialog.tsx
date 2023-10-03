@@ -7,7 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from './ui';
+} from './ui/alert-dialog';
 
 type AlertDialogProps = React.PropsWithChildren<{
   title: string;
@@ -15,6 +15,12 @@ type AlertDialogProps = React.PropsWithChildren<{
   onConfirm: () => void;
 }>;
 
+/**
+ *
+ * @param {AlertDialogProps['title']} title The wording for the dialog heading.
+ * @param {AlertDialogProps['description']} description Additional descriptive text for the dialog.
+ * @returns
+ */
 export function AlertDialog({
   children,
   title,
@@ -37,3 +43,5 @@ export function AlertDialog({
     </AlertDialogComponent>
   );
 }
+
+export { AlertDialogTrigger } from './ui/alert-dialog';

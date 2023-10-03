@@ -11,8 +11,7 @@ import type { LinksFunction } from '@remix-run/node';
 
 import mainStylesheetUrl from './styles/main.css';
 import tailwindStylesheetUrl from './styles/tailwind.css';
-
-const PREFERS_DARK_MEDIA_QUERY = '(prefers-color-scheme: dark)';
+import { ThemeScript } from './components';
 
 export const links: LinksFunction = () => [
   { rel: 'icon', href: 'favicon.png' },
@@ -26,18 +25,7 @@ export default function App() {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              const prefersDarkMode = window.matchMedia(${JSON.stringify(
-                PREFERS_DARK_MEDIA_QUERY
-              )}).matches
-              if (prefersDarkMode) {
-                document.documentElement.classList.add('dark')
-              }
-            `,
-          }}
-        ></script>
+        <ThemeScript />
         <Meta />
         <Links />
       </head>

@@ -12,13 +12,17 @@ import { json, redirect } from '@remix-run/node';
 import invariant from 'tiny-invariant';
 import clsx from 'clsx';
 import { createUser, getUser } from '~/models/user.server';
-import { Input, Separator, Button, Checkbox } from '~/components/ui';
 import {
   AlertDialog,
+  AlertDialogTrigger,
+  Button,
+  Checkbox,
   CopyToClipboard,
   EmailCard,
   EmailPreviewBody,
   EmailPreviewHeader,
+  Input,
+  Separator,
   Tooltip,
 } from '~/components';
 import {
@@ -31,7 +35,6 @@ import {
   markEmailsAsRead,
   markEmailsAsUnread,
 } from '~/models/email.server';
-import { AlertDialogTrigger } from '~/components/ui/alert-dialog';
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
