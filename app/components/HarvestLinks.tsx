@@ -49,7 +49,12 @@ export function HarvestLinks({ email }: HarvestLinksProps) {
     <Dialog>
       <Tooltip content="Harvest links">
         <DialogTrigger asChild>
-          <Button variant="ghost" type="button" size="icon">
+          <Button
+            variant="ghost"
+            className="hover:bg-zinc-300"
+            type="button"
+            size="icon"
+          >
             <Link2Icon />
           </Button>
         </DialogTrigger>

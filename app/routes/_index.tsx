@@ -122,7 +122,7 @@ export default function Index() {
         height={150}
         width={150}
         className={clsx(
-          'shuttle-logo cursor-pointer',
+          'shuttle-logo cursor-pointer invert dark:invert-0',
           isAnimating
             ? 'shuttle-logo-animation'
             : 'animate-[pulse_3s_cubic-bezier(0.4,0,0.6,1)_infinite]'

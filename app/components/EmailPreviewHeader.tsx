@@ -50,6 +50,7 @@ export function EmailPreviewHeader({
             size="icon"
             name="_action"
             value="markSelectedUnread"
+            className="hover:bg-zinc-300"
           >
             <EnvelopeClosedIcon />
           </Button>
@@ -88,6 +89,7 @@ export function EmailPreviewHeader({
             <Button
               type="button"
               variant="ghost"
+              className="hover:bg-zinc-300"
               size="icon"
               onClick={() => {
                 submit(
