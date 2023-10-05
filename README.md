@@ -35,6 +35,25 @@ Returns all emails sent to the user.
 
 Returns the last email sent to the user.
 
+- Query Params:
+  - `link` - If a value is provided, the response will be the href of the link with the given text. The value should be a url encoded string. It is not case sensitive.
+  - `param` - (Must be used with `link`) If a value is provided, the response will be the value of the query param with the given name in the href of the link with the given text.
+
+#### Example
+```
+GET https://shuttle-app.netlify.com/api/john-smith/last?link=verify%20account&param=token
+```
+
+Assuming a DOM element like this exists in the last email sent to `john-smith`:
+```html
+<a href="https://example.com/verify?token=12345">Verify Account</a>
+```
+
+The response would be:
+```
+12345
+```
+
 ## Development
 
 ### Database

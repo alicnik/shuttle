@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express, { Router } from 'express';
 import serverless from 'serverless-http';
 import multer from 'multer';
+import { parse } from 'node-html-parser';
 import { db } from 'db';
 
 const app = express();
@@ -84,7 +85,48 @@ router.get('/:userId/last', async (req, res) => {
     return;
   }
 
-  res.status(200).send(email.html);
+  let data = email.html;
+  const { link, param } = req.query;
+
+  if (link && typeof link === 'string') {
+    const linkText = decodeURIComponent(link);
+    const root = parse(email.html);
+    const links = root.querySelectorAll('a');
+    const targetLink = links.find(
+      ({ text }) => text.toLowerCase() === linkText.toLowerCase()
+    );
+
+    if (!targetLink) {
+      res.status(404).send(`Link with text "${link}" not found.`);
+      return;
+    }
+
+    const href = targetLink.getAttribute('href');
+    if (!href) {
+      res.status(404).send(`Target link "${targetLink}" has no href.`);
+      return;
+    }
+
+    data = href;
+
+    if (param && typeof param === 'string') {
+      const url = new URL(href);
+      const targetParamValue = url.searchParams.get(param);
+
+      if (!targetParamValue) {
+        res
+          .status(404)
+          .send(
+            `Param "${param}" not found in href "${href}" on target link "${targetLink}".`
+          );
+        return;
+      }
+
+      data = targetParamValue;
+    }
+  }
+
+  res.status(200).send(data);
 });
 
 app.use('/api/', router);
