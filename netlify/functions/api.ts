@@ -89,11 +89,11 @@ router.get('/:userId/last', async (req, res) => {
   const { link, param } = req.query;
 
   if (link && typeof link === 'string') {
-    const linkText = decodeURIComponent(link);
+    const targetLinkText = decodeURIComponent(link);
     const root = parse(email.html);
     const links = root.querySelectorAll('a');
     const targetLink = links.find(
-      ({ text }) => text.toLowerCase() === linkText.toLowerCase()
+      ({ text }) => text.trim().toLowerCase() === targetLinkText.trim().toLowerCase()
     );
 
     if (!targetLink) {
