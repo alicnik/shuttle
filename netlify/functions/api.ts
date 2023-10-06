@@ -126,7 +126,7 @@ router.get('/:userId/last', async (req, res) => {
     }
   }
 
-  res.status(200).send(data);
+  res.status(200).set('Content-Type', link ? 'text/plain' : 'text/html').send(data);
 });
 
 app.use('/api/', router);
