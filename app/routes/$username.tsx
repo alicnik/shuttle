@@ -1,14 +1,16 @@
 import * as React from 'react';
 import {
+  Await,
   Form,
   Link,
   useLoaderData,
   useNavigation,
+  useParams,
   useRevalidator,
   useSearchParams,
   useSubmit,
 } from '@remix-run/react';
-import { json, redirect } from '@remix-run/node';
+import { defer, redirect } from '@remix-run/node';
 import invariant from 'tiny-invariant';
 import clsx from 'clsx';
 import { createUser, getUser } from '~/models/user.server';
@@ -42,23 +44,26 @@ import type {
 } from '@remix-run/node';
 import { syncSession } from '~/lib/session.server';
 import { EMAIL_ADRESS_COPY_SUCCESS_MESSAGE } from '~/lib';
+import type { Email, User } from '@prisma/client';
+import { Spinner } from '~/components/Spinner';
+
+type OptionalUserWithEmails = (User & { emails: Email[] }) | null;
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { username } = params;
   invariant(username, 'Username is required');
-  let user = await getUser(username);
+  let user: OptionalUserWithEmails | Promise<OptionalUserWithEmails> =
+    await getUser(username);
 
   if (!user) {
-    user = await createUser(username);
+    user = createUser(username);
   }
 
-  invariant(user, 'User must exist');
-
-  return json(
+  return defer(
     { user },
     {
       headers: {
-        'Set-Cookie': await syncSession(request, user.id),
+        'Set-Cookie': await syncSession(request, username),
       },
     }
   );
@@ -113,7 +118,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export const meta: MetaFunction<typeof loader> = ({ params, data }) => {
   const { username } = params;
-  const { emails } = data?.user || {};
+  const { user } = data || {};
+  if (!user || user instanceof Promise) {
+    return [{ title: `Inbox - ${username}@shuttle.email` }];
+  }
+  const { emails } = user;
   const unreadEmails = emails?.filter((email) => !email.read);
   const inboxTitleSegment = unreadEmails?.length
     ? `Inbox (${unreadEmails.length})`
@@ -125,6 +134,7 @@ export default function UserInbox() {
   const submit = useSubmit();
   const navigation = useNavigation();
   const revalidator = useRevalidator();
+  const { username } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [selectedState, setSelected] = React.useState<string[]>([]);
@@ -142,19 +152,7 @@ export default function UserInbox() {
       ? String(navigation.formData?.get('emailId'))
       : null;
 
-  const emailsToDisplay = user.emails
-    .filter(({ id }) => !emailsBeingDeleted.includes(id))
-    .filter(
-      ({ subject, text }) =>
-        subject?.toLowerCase().includes(searchTerm) ||
-        text?.toLowerCase().includes(searchTerm)
-    )
-    .map((email) => ({ ...email, createdAt: new Date(email.createdAt) }));
-
   const preview = searchParams.get('preview');
-  const previewEmail = user.emails.find(({ id }) =>
-    [preview, newPreview].includes(id)
-  );
 
   const selected = selectedState.concat(
     newPreview || searchParams.get('preview') || []
@@ -193,164 +191,202 @@ export default function UserInbox() {
   }, []);
 
   return (
-    <>
-      <div className="container mx-auto flex h-full w-full gap-6 rounded-md p-4">
-        <div className="w-full rounded-md md:w-80 lg:w-96">
-          <div className="mb-8 flex items-baseline justify-between gap-3">
-            <Link to="/" className="flex-1">
-              <h1 className="text-3xl font-bold">Shuttle</h1>
-            </Link>
-            <Tooltip
-              content={`${user.id}@shuttle.email`}
-              side="bottom"
-              sideOffset={8}
-            >
-              <span className="w-min max-w-[150px] truncate text-right text-sm lg:max-w-[200px]">
-                {user.id}@shuttle.email
-              </span>
-            </Tooltip>
-            <CopyToClipboard
-              copyText={`${user.id}@shuttle.email`}
-              successMessage={EMAIL_ADRESS_COPY_SUCCESS_MESSAGE}
-              tooltipOptions={{
-                content: 'Copy email address',
-                side: 'bottom',
-                sideOffset: 8,
-              }}
-            />
+    <React.Suspense
+      fallback={
+        <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-4">
+          <Spinner size="lg" />
+          <div className="text-center">
+            <p>Creating an inbox for</p>
+            <p>{username}@shuttle.email</p>
           </div>
-          <Input
-            className="mb-6"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Form method="post">
-            <input type="hidden" name="selected" value={selected.join(',')} />
-            <div className="mb-6 flex gap-4">
-              <Checkbox
-                className="ml-2 mr-2 mt-[10px]"
-                checked={
-                  emailsToDisplay.length > 0 &&
-                  emailsToDisplay.every(({ id }) => selected.includes(id))
-                }
-                disabled={emailsToDisplay.length === 0}
-                onCheckedChange={() => {
-                  setSelected((selected) => {
-                    if (selected.length === emailsToDisplay.length) {
-                      if (preview) {
+        </div>
+      }
+    >
+      <Await resolve={user}>
+        {(user) => {
+          if (!user) {
+            return null;
+          }
+          const emailsToDisplay = user.emails
+            .filter(({ id }) => !emailsBeingDeleted.includes(id))
+            .filter(
+              ({ subject, text }) =>
+                subject?.toLowerCase().includes(searchTerm) ||
+                text?.toLowerCase().includes(searchTerm)
+            )
+            .map((email) => ({
+              ...email,
+              createdAt: new Date(email.createdAt),
+            }));
+
+          const previewEmail = user.emails.find(({ id }) =>
+            [preview, newPreview].includes(id)
+          );
+          return (
+            <div className="container mx-auto flex h-full w-full gap-6 rounded-md p-4">
+              <div className="w-full rounded-md md:w-80 lg:w-96">
+                <div className="mb-8 flex items-baseline justify-between gap-3">
+                  <Link to="/" className="flex-1">
+                    <h1 className="text-3xl font-bold">Shuttle</h1>
+                  </Link>
+                  <Tooltip
+                    content={`${user.id}@shuttle.email`}
+                    side="bottom"
+                    sideOffset={8}
+                  >
+                    <span className="w-min max-w-[150px] truncate text-right text-sm lg:max-w-[200px]">
+                      {user.id}@shuttle.email
+                    </span>
+                  </Tooltip>
+                  <CopyToClipboard
+                    copyText={`${user.id}@shuttle.email`}
+                    successMessage={EMAIL_ADRESS_COPY_SUCCESS_MESSAGE}
+                    tooltipOptions={{
+                      content: 'Copy email address',
+                      side: 'bottom',
+                      sideOffset: 8,
+                    }}
+                  />
+                </div>
+                <Input
+                  className="mb-6"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Form method="post">
+                  <input
+                    type="hidden"
+                    name="selected"
+                    value={selected.join(',')}
+                  />
+                  <div className="mb-6 flex gap-4">
+                    <Checkbox
+                      className="ml-2 mr-2 mt-[10px]"
+                      checked={
+                        emailsToDisplay.length > 0 &&
+                        emailsToDisplay.every(({ id }) => selected.includes(id))
+                      }
+                      disabled={emailsToDisplay.length === 0}
+                      onCheckedChange={() => {
+                        setSelected((selected) => {
+                          if (selected.length === emailsToDisplay.length) {
+                            if (preview) {
+                              setSearchParams((params) => {
+                                params.delete('preview');
+                                return params;
+                              });
+                            }
+                            return [];
+                          }
+                          return emailsToDisplay.map(({ id }) => id);
+                        });
+                      }}
+                    />
+                    <Tooltip content="Mark as unread">
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        size="icon"
+                        name="_action"
+                        value="markSelectedUnread"
+                        disabled={selected.length === 0}
+                      >
+                        <EnvelopeClosedIcon />
+                      </Button>
+                    </Tooltip>
+                    <AlertDialog
+                      title="Are you sure?"
+                      description="This action cannot be undone."
+                      onConfirm={() => {
+                        setSelected([]);
                         setSearchParams((params) => {
-                          params.delete('preview');
+                          if (preview && selected.includes(preview)) {
+                            params.delete('preview');
+                          }
                           return params;
                         });
-                      }
-                      return [];
-                    }
-                    return emailsToDisplay.map(({ id }) => id);
-                  });
-                }}
-              />
-              <Tooltip content="Mark as unread">
-                <Button
-                  type="submit"
-                  variant="outline"
-                  size="icon"
-                  name="_action"
-                  value="markSelectedUnread"
-                  disabled={selected.length === 0}
-                >
-                  <EnvelopeClosedIcon />
-                </Button>
-              </Tooltip>
-              <AlertDialog
-                title="Are you sure?"
-                description="This action cannot be undone."
-                onConfirm={() => {
-                  setSelected([]);
-                  setSearchParams((params) => {
-                    if (preview && selected.includes(preview)) {
-                      params.delete('preview');
-                    }
-                    return params;
-                  });
-                  submit(
-                    {
-                      _action: 'deleteSelected',
-                      selected: selected.join(','),
-                    },
-                    { method: 'post' }
-                  );
-                }}
-              >
-                <Tooltip content="Delete">
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      type="button"
-                      name="_action"
-                      value="deleteSelected"
-                      variant="outline"
-                      className="hover:bg-destructive"
-                      size="icon"
-                      disabled={selected.length === 0}
+                        submit(
+                          {
+                            _action: 'deleteSelected',
+                            selected: selected.join(','),
+                          },
+                          { method: 'post' }
+                        );
+                      }}
                     >
-                      <TrashIcon />
-                    </Button>
-                  </AlertDialogTrigger>
-                </Tooltip>
-              </AlertDialog>
-              <Tooltip content="Check for new emails">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  type="button"
-                  onClick={() => {
-                    revalidator.revalidate();
-                  }}
-                >
-                  <UpdateIcon
-                    className={clsx(isRevalidating && 'animate-spin')}
+                      <Tooltip content="Delete">
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            type="button"
+                            name="_action"
+                            value="deleteSelected"
+                            variant="outline"
+                            className="hover:bg-destructive"
+                            size="icon"
+                            disabled={selected.length === 0}
+                          >
+                            <TrashIcon />
+                          </Button>
+                        </AlertDialogTrigger>
+                      </Tooltip>
+                    </AlertDialog>
+                    <Tooltip content="Check for new emails">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        type="button"
+                        onClick={() => {
+                          revalidator.revalidate();
+                        }}
+                      >
+                        <UpdateIcon
+                          className={clsx(isRevalidating && 'animate-spin')}
+                        />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                </Form>
+                {emailsToDisplay.length ? (
+                  <div className="email-list h-full overflow-y-auto">
+                    {emailsToDisplay.map((email, index) => {
+                      return (
+                        <React.Fragment key={email.id}>
+                          <EmailCard
+                            email={email}
+                            selected={selected}
+                            setSelected={setSelected}
+                          />
+                          {index !== emailsToDisplay.length - 1 && (
+                            <Separator className="mb-4" />
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm italic">
+                    {searchTerm ? `No results...` : 'No emails in here...'}
+                  </p>
+                )}
+              </div>
+              <div className="hidden flex-1 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-200 md:block">
+                {previewEmail ? (
+                  <EmailPreviewHeader
+                    email={{
+                      ...previewEmail,
+                      createdAt: new Date(previewEmail.createdAt),
+                    }}
+                    userId={user.id}
+                    setSelected={setSelected}
                   />
-                </Button>
-              </Tooltip>
+                ) : null}
+                <EmailPreviewBody html={previewEmail?.html} />
+              </div>
             </div>
-          </Form>
-          {emailsToDisplay.length ? (
-            <div className="email-list h-full overflow-y-auto">
-              {emailsToDisplay.map((email, index) => {
-                return (
-                  <React.Fragment key={email.id}>
-                    <EmailCard
-                      email={email}
-                      selected={selected}
-                      setSelected={setSelected}
-                    />
-                    {index !== emailsToDisplay.length - 1 && (
-                      <Separator className="mb-4" />
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-sm italic">
-              {searchTerm ? `No results...` : 'No emails in here...'}
-            </p>
-          )}
-        </div>
-        <div className="hidden flex-1 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-200 md:block">
-          {previewEmail ? (
-            <EmailPreviewHeader
-              email={{
-                ...previewEmail,
-                createdAt: new Date(previewEmail.createdAt),
-              }}
-              userId={user.id}
-              setSelected={setSelected}
-            />
-          ) : null}
-          <EmailPreviewBody html={previewEmail?.html} />
-        </div>
-      </div>
-    </>
+          );
+        }}
+      </Await>
+    </React.Suspense>
   );
 }
