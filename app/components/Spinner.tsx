@@ -1,7 +1,18 @@
-export function Spinner() {
+import clsx from 'clsx';
+
+interface SpinnerProps {
+  size?: 'md' | 'lg';
+}
+
+export function Spinner({ size = 'md' }: SpinnerProps) {
+  const dimensions = {
+    md: 'h-7 w-7',
+    lg: 'h-10 w-10',
+  }[size];
+
   return (
     <svg
-      className="h-7 w-7 animate-spin text-zinc-600"
+      className={clsx(dimensions, 'animate-spin text-zinc-600')}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
