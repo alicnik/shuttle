@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`EmailCard > should match the snapshot for desktop view 1`] = `
+exports[`EmailCard > render > should match the snapshot for desktop view 1`] = `
 <div>
   <div
     class="mb-4 flex gap-2 rounded-md p-2 hover:bg-zinc-200 data-[in-view=true]:bg-zinc-200 data-[selected=true]:bg-zinc-200 dark:hover:bg-zinc-800 dark:data-[in-view=true]:bg-zinc-800 dark:data-[selected=true]:bg-zinc-800"
@@ -64,7 +64,7 @@ exports[`EmailCard > should match the snapshot for desktop view 1`] = `
 </div>
 `;
 
-exports[`EmailCard > should match the snapshot for mobile view 1`] = `
+exports[`EmailCard > render > should match the snapshot for mobile view 1`] = `
 <div>
   <div
     class="mb-4 flex gap-2 rounded-md p-2 hover:bg-zinc-200 data-[in-view=true]:bg-zinc-200 data-[selected=true]:bg-zinc-200 dark:hover:bg-zinc-800 dark:data-[in-view=true]:bg-zinc-800 dark:data-[selected=true]:bg-zinc-800"
@@ -118,7 +118,7 @@ exports[`EmailCard > should match the snapshot for mobile view 1`] = `
 </div>
 `;
 
-exports[`EmailCard > should match the snapshot for tablet view 1`] = `
+exports[`EmailCard > render > should match the snapshot for tablet view 1`] = `
 <div>
   <div
     class="mb-4 flex gap-2 rounded-md p-2 hover:bg-zinc-200 data-[in-view=true]:bg-zinc-200 data-[selected=true]:bg-zinc-200 dark:hover:bg-zinc-800 dark:data-[in-view=true]:bg-zinc-800 dark:data-[selected=true]:bg-zinc-800"

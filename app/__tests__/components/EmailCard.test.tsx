@@ -36,117 +36,133 @@ const props = {
 };
 
 describe('EmailCard', () => {
-  beforeEach(() => {
-    setWindowWidth(1024);
-  });
-
-  it('should match the snapshot for mobile view', () => {
-    setWindowWidth(375);
-
-    const { container } = setupRemixStub(<EmailCard {...props} />);
-
-    expect(container).toMatchSnapshot();
-  });
-
-  it('should match the snapshot for tablet view', () => {
-    setWindowWidth(768);
-
-    const { container } = setupRemixStub(<EmailCard {...props} />);
-
-    expect(container).toMatchSnapshot();
-  });
-
-  it('should match the snapshot for desktop view', () => {
-    setWindowWidth(1024);
-
-    const { container } = setupRemixStub(<EmailCard {...props} />);
-
-    expect(container).toMatchSnapshot();
-  });
-
-  it('applies the data-selected attribute when the email is selected', () => {
-    setupRemixStub(<EmailCard {...props} selected={['mock-id']} />);
-
-    const card = screen.getByTestId('email-card');
-    const checkbox = screen.getByRole('checkbox');
-
-    expect(card).toHaveAttribute('data-selected', 'true');
-    expect(checkbox).toBeChecked();
-  });
-
-  it('applies the data-in-view attribute when the email is being previewed', () => {
-    vi.mocked(useSearchParams).mockReturnValueOnce([
-      new URLSearchParams({
-        preview: props.email.id,
-      }),
-      vi.fn(),
-    ]);
-
-    setupRemixStub(<EmailCard {...props} />);
-
-    const card = screen.getByTestId('email-card');
-
-    expect(card).toHaveAttribute('data-in-view', 'true');
-  });
-
-  it.each([
-    { state: 'read', read: true },
-    { state: 'unread', read: false },
-  ])(`applies the data-read attribute when the email is $state`, ({ read }) => {
-    setupRemixStub(<EmailCard {...props} email={{ ...props.email, read }} />);
-
-    const button = screen.getByRole('button');
-
-    expect(button).toHaveAttribute('data-read', String(read));
-  });
-
-  it('applies the data-read attribute optimistically when the email is marked read', () => {
-    const formData = createMockFormData({
-      _action: 'markRead',
-      emailId: props.email.id,
+  describe('render', () => {
+    beforeEach(() => {
+      setWindowWidth(1024);
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('October 13, 2023 13:07:00'));
     });
 
-    vi.mocked(useNavigation).mockReturnValueOnce(
-      fromPartial({
-        state: 'loading',
-        formData,
-      })
-    );
-
-    setupRemixStub(<EmailCard {...props} />);
-
-    const button = screen.getByRole('button');
-
-    expect(button).toHaveAttribute('data-read', 'true');
-  });
-
-  it('disapplies the data-read attribute optimistically when the email is marked unread', () => {
-    const formData = createMockFormData({
-      _action: 'markSelectedUnread',
-      selected: props.email.id,
+    afterEach(() => {
+      vi.runOnlyPendingTimers();
+      vi.useRealTimers();
     });
 
-    vi.mocked(useNavigation).mockReturnValueOnce(
-      fromPartial({
-        state: 'loading',
-        formData,
-      })
+    it('should match the snapshot for mobile view', () => {
+      setWindowWidth(375);
+
+      const { container } = setupRemixStub(<EmailCard {...props} />);
+
+      expect(container).toMatchSnapshot();
+    });
+
+    it('should match the snapshot for tablet view', () => {
+      setWindowWidth(768);
+
+      const { container } = setupRemixStub(<EmailCard {...props} />);
+
+      expect(container).toMatchSnapshot();
+    });
+
+    it('should match the snapshot for desktop view', () => {
+      setWindowWidth(1024);
+
+      const { container } = setupRemixStub(<EmailCard {...props} />);
+
+      expect(container).toMatchSnapshot();
+    });
+
+    it('applies the data-selected attribute when the email is selected', () => {
+      setupRemixStub(<EmailCard {...props} selected={['mock-id']} />);
+
+      const card = screen.getByTestId('email-card');
+      const checkbox = screen.getByRole('checkbox');
+
+      expect(card).toHaveAttribute('data-selected', 'true');
+      expect(checkbox).toBeChecked();
+    });
+
+    it('applies the data-in-view attribute when the email is being previewed', () => {
+      vi.mocked(useSearchParams).mockReturnValueOnce([
+        new URLSearchParams({
+          preview: props.email.id,
+        }),
+        vi.fn(),
+      ]);
+
+      setupRemixStub(<EmailCard {...props} />);
+
+      const card = screen.getByTestId('email-card');
+
+      expect(card).toHaveAttribute('data-in-view', 'true');
+    });
+
+    it.each([
+      { state: 'read', read: true },
+      { state: 'unread', read: false },
+    ])(
+      `applies the data-read attribute when the email is $state`,
+      ({ read }) => {
+        setupRemixStub(
+          <EmailCard {...props} email={{ ...props.email, read }} />
+        );
+
+        const button = screen.getByRole('button');
+
+        expect(button).toHaveAttribute('data-read', String(read));
+      }
     );
 
-    setupRemixStub(
-      <EmailCard {...props} email={{ ...props.email, read: true }} />
-    );
+    it('applies the data-read attribute optimistically when the email is marked read', () => {
+      const formData = createMockFormData({
+        _action: 'markRead',
+        emailId: props.email.id,
+      });
 
-    const button = screen.getByRole('button');
+      vi.mocked(useNavigation).mockReturnValueOnce(
+        fromPartial({
+          state: 'loading',
+          formData,
+        })
+      );
 
-    expect(button).toHaveAttribute('data-read', 'false');
+      setupRemixStub(<EmailCard {...props} />);
+
+      const button = screen.getByRole('button');
+
+      expect(button).toHaveAttribute('data-read', 'true');
+    });
+
+    it('disapplies the data-read attribute optimistically when the email is marked unread', () => {
+      const formData = createMockFormData({
+        _action: 'markSelectedUnread',
+        selected: props.email.id,
+      });
+
+      vi.mocked(useNavigation).mockReturnValueOnce(
+        fromPartial({
+          state: 'loading',
+          formData,
+        })
+      );
+
+      setupRemixStub(
+        <EmailCard {...props} email={{ ...props.email, read: true }} />
+      );
+
+      const button = screen.getByRole('button');
+
+      expect(button).toHaveAttribute('data-read', 'false');
+    });
   });
 
-  it('resets the selected emails when the card is clicked', async () => {
-    const { user } = setupRemixStub(<EmailCard {...props} />);
+  describe('interaction', () => {
+    it('resets the selected emails when the card is clicked', async () => {
+      const { user } = setupRemixStub(<EmailCard {...props} />);
 
-    await user.click(screen.getByRole('button'));
+      await user.click(screen.getByRole('button'));
 
-    expect(props.setSelected).toHaveBeenCalledWith([]);
+      expect(props.setSelected).toHaveBeenCalledWith([]);
+    });
   });
 });
