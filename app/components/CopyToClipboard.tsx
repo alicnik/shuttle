@@ -19,9 +19,12 @@ export function CopyToClipboard({
   return (
     <Tooltip content={content} side={side} sideOffset={sideOffset}>
       <ClipboardCopyIcon
+        data-testid="clipboard-copy-icon"
         className="translate-y-[3px] cursor-pointer"
         onClick={async () => {
-          await navigator.clipboard.writeText(copyText);
+          const blob = new Blob([copyText], { type: 'text/plain' });
+          const item = new ClipboardItem({ 'text/plain': blob });
+          await navigator.clipboard.write([item]);
           toast({ description: successMessage });
         }}
       />

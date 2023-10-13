@@ -1,0 +1,18 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AlertDialog > should open the dialog and render the expected content when the AlertDialogTrigger is clicked 1`] = `
+<div
+  aria-hidden="true"
+  data-aria-hidden="true"
+>
+  <button
+    aria-controls="radix-:r0:"
+    aria-expanded="true"
+    aria-haspopup="dialog"
+    data-state="open"
+    type="button"
+  >
+    Open dialog
+  </button>
+</div>
+`;

@@ -15,7 +15,7 @@ export function EmailCard({ email, selected, setSelected }: EmailCardProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigation = useNavigation();
   const { width } = useViewportSize();
-  const isTablet = width && width > 768;
+  const isTablet = width && width >= 768;
 
   const isOptimisticRead =
     ['submitting', 'loading'].includes(navigation.state) &&
@@ -32,6 +32,7 @@ export function EmailCard({ email, selected, setSelected }: EmailCardProps) {
 
   return (
     <div
+      data-testid="email-card"
       data-selected={isSelected}
       data-in-view={isPreview}
       className={clsx(
