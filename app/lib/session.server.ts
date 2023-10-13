@@ -1,3 +1,4 @@
+import type { Session } from '@remix-run/node';
 import { createCookieSessionStorage } from '@remix-run/node';
 
 const { getSession, commitSession } = createCookieSessionStorage<{
@@ -21,13 +22,16 @@ const getShuttleSession = async (request: Request) => {
   return session;
 };
 
-export const syncSession = async (request: Request, username?: string) => {
-  const session = await getShuttleSession(request);
-
+const getTodaysInboxes = (session: Session) => {
   const currentInboxes: SessionInbox[] = session.get('inboxes') || [];
-  const todaysInboxes = currentInboxes.filter(
+  return currentInboxes.filter(
     (inbox) => inbox.date === new Date().toISOString().slice(0, 10)
   );
+};
+
+export const syncSession = async (request: Request, username?: string) => {
+  const session = await getShuttleSession(request);
+  const todaysInboxes = getTodaysInboxes(session);
 
   if (username && !todaysInboxes.find((inbox) => inbox.username === username)) {
     todaysInboxes.push({
@@ -43,5 +47,5 @@ export const syncSession = async (request: Request, username?: string) => {
 
 export const getInboxes = async (request: Request) => {
   const session = await getShuttleSession(request);
-  return session.get('inboxes');
+  return getTodaysInboxes(session);
 };
