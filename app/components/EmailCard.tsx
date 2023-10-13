@@ -49,13 +49,14 @@ export function EmailCard({ email, selected, setSelected }: EmailCardProps) {
             if (checked) {
               return [...selected, email.id];
             }
+            const withoutCurrent = selected.filter((id) => id !== email.id);
             if (isPreview) {
               setSearchParams((params) => {
-                params.set('preview', selected[0]);
+                params.set('preview', withoutCurrent[0]);
                 return params;
               });
             }
-            return selected.filter((id) => id !== email.id);
+            return withoutCurrent;
           });
         }}
       />

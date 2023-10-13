@@ -24,6 +24,7 @@ export function EmailPreviewBody({ html }: { html?: Email['html'] }) {
 
   return (
     <iframe
+      data-testid="email-preview-body"
       className={clsx('email-preview', 'h-full w-full')}
       srcDoc={htmlWithBaseTag}
       title="Email preview"

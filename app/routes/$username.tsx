@@ -344,7 +344,6 @@ export default function UserInbox() {
                 ...previewEmail,
                 createdAt: new Date(previewEmail.createdAt),
               }}
-              userId={user.id}
               setSelected={setSelected}
             />
           ) : null}

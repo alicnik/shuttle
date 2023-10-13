@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Theme > should match the snapshot 1`] = `
+<div>
+  <script>
+    
+      const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+      if (prefersDarkMode) {
+        document.documentElement.classList.add('dark')
+      }
+    
+  </script>
+</div>
+`;

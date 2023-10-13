@@ -34,6 +34,7 @@ describe('EmailCard', () => {
     afterEach(() => {
       vi.runOnlyPendingTimers();
       vi.useRealTimers();
+      vi.restoreAllMocks();
     });
 
     it('should match the snapshot for mobile view', () => {
@@ -58,6 +59,17 @@ describe('EmailCard', () => {
       const { container } = setupRemixStub(<EmailCard {...props} />);
 
       expect(container).toMatchSnapshot();
+    });
+
+    it('renders the email from when it is received in angle brackets', () => {
+      setupRemixStub(
+        <EmailCard
+          {...props}
+          email={{ ...props.email, from: '<Joe Bloggs>' }}
+        />
+      );
+
+      expect(screen.getByText('Joe Bloggs')).toBeInTheDocument();
     });
 
     it('applies the data-selected attribute when the email is selected', () => {
@@ -152,5 +164,42 @@ describe('EmailCard', () => {
 
       expect(props.setSelected).toHaveBeenCalledWith([]);
     });
+  });
+
+  it('adds the email id to the existing selected emails when the checkbox is checked', async () => {
+    const { user } = setupRemixStub(<EmailCard {...props} />);
+
+    await user.click(screen.getByRole('checkbox'));
+
+    const setSelectedCallback = props.setSelected.mock.lastCall[0];
+    const nextState = setSelectedCallback(['existing-id']);
+
+    expect(nextState).toEqual(['existing-id', 'mock-id']);
+  });
+
+  it('removes the email id from the existing selected emails when the checkbox is unchecked', async () => {
+    const mockSearchParams = new URLSearchParams({ preview: props.email.id });
+    const mockSetSearchParams = vi.fn();
+    vi.mocked(useSearchParams).mockReturnValueOnce([
+      mockSearchParams,
+      mockSetSearchParams,
+    ]);
+
+    const { user } = setupRemixStub(
+      <EmailCard {...props} selected={['mock-id']} />
+    );
+
+    await user.click(screen.getByRole('checkbox'));
+
+    const setSelectedCallback = props.setSelected.mock.lastCall[0];
+    const nextSelectedState = setSelectedCallback(['mock-id', 'existing-id']);
+
+    const setSearchParamsCallback = mockSetSearchParams.mock.lastCall[0];
+    const nextSearchParamsState = setSearchParamsCallback(mockSearchParams);
+
+    expect(nextSelectedState).toEqual(['existing-id']);
+    expect(nextSearchParamsState).toEqual(
+      new URLSearchParams({ preview: 'existing-id' })
+    );
   });
 });
