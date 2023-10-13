@@ -1,0 +1,183 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EmailCard > should match the snapshot for desktop view 1`] = `
+<div>
+  <div
+    class="mb-4 flex gap-2 rounded-md p-2 hover:bg-zinc-200 data-[in-view=true]:bg-zinc-200 data-[selected=true]:bg-zinc-200 dark:hover:bg-zinc-800 dark:data-[in-view=true]:bg-zinc-800 dark:data-[selected=true]:bg-zinc-800"
+    data-in-view="false"
+    data-selected="false"
+    data-testid="email-card"
+  >
+    <button
+      aria-checked="false"
+      class="peer h-4 w-4 shrink-0 rounded-sm border border-primary shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground mt-[2px]"
+      data-state="unchecked"
+      role="checkbox"
+      type="button"
+      value="on"
+    />
+    <form
+      action="/"
+      class="w-full"
+      method="post"
+    >
+      <input
+        name="emailId"
+        type="hidden"
+        value="mock-id"
+      />
+       
+      <button
+        class="w-full cursor-pointer text-left data-[read=true]:opacity-50"
+        data-read="false"
+        name="_action"
+        type="submit"
+        value="setPreview"
+      >
+        <div
+          class="mb-1 flex items-center justify-between "
+        >
+          <p
+            class="w-max max-w-[180px] truncate text-sm font-bold"
+          >
+            mock-from
+          </p>
+          <p
+            class="ml-auto w-max text-xs"
+          >
+            13:07
+          </p>
+        </div>
+        <p
+          class="mb-1 max-w-[250px] truncate text-sm"
+        >
+          mock-subject
+        </p>
+        <p
+          class="line-clamp-2 max-w-[300px] text-xs"
+        >
+          mock-text
+        </p>
+      </button>
+    </form>
+  </div>
+</div>
+`;
+
+exports[`EmailCard > should match the snapshot for mobile view 1`] = `
+<div>
+  <div
+    class="mb-4 flex gap-2 rounded-md p-2 hover:bg-zinc-200 data-[in-view=true]:bg-zinc-200 data-[selected=true]:bg-zinc-200 dark:hover:bg-zinc-800 dark:data-[in-view=true]:bg-zinc-800 dark:data-[selected=true]:bg-zinc-800"
+    data-in-view="false"
+    data-selected="false"
+    data-testid="email-card"
+  >
+    <button
+      aria-checked="false"
+      class="peer h-4 w-4 shrink-0 rounded-sm border border-primary shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground mt-[2px]"
+      data-state="unchecked"
+      role="checkbox"
+      type="button"
+      value="on"
+    />
+    <a
+      class="w-full"
+      href="/mock-user-id/mock-id"
+    >
+      <button
+        class="w-full cursor-pointer text-left data-[read=true]:opacity-50"
+        data-read="false"
+      >
+        <div
+          class="mb-1 flex items-center justify-between "
+        >
+          <p
+            class="w-max max-w-[180px] truncate text-sm font-bold"
+          >
+            mock-from
+          </p>
+          <p
+            class="ml-auto w-max text-xs"
+          >
+            13:07
+          </p>
+        </div>
+        <p
+          class="mb-1 max-w-[250px] truncate text-sm"
+        >
+          mock-subject
+        </p>
+        <p
+          class="line-clamp-2 max-w-[300px] text-xs"
+        >
+          mock-text
+        </p>
+      </button>
+    </a>
+  </div>
+</div>
+`;
+
+exports[`EmailCard > should match the snapshot for tablet view 1`] = `
+<div>
+  <div
+    class="mb-4 flex gap-2 rounded-md p-2 hover:bg-zinc-200 data-[in-view=true]:bg-zinc-200 data-[selected=true]:bg-zinc-200 dark:hover:bg-zinc-800 dark:data-[in-view=true]:bg-zinc-800 dark:data-[selected=true]:bg-zinc-800"
+    data-in-view="false"
+    data-selected="false"
+    data-testid="email-card"
+  >
+    <button
+      aria-checked="false"
+      class="peer h-4 w-4 shrink-0 rounded-sm border border-primary shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground mt-[2px]"
+      data-state="unchecked"
+      role="checkbox"
+      type="button"
+      value="on"
+    />
+    <form
+      action="/"
+      class="w-full"
+      method="post"
+    >
+      <input
+        name="emailId"
+        type="hidden"
+        value="mock-id"
+      />
+       
+      <button
+        class="w-full cursor-pointer text-left data-[read=true]:opacity-50"
+        data-read="false"
+        name="_action"
+        type="submit"
+        value="setPreview"
+      >
+        <div
+          class="mb-1 flex items-center justify-between "
+        >
+          <p
+            class="w-max max-w-[180px] truncate text-sm font-bold"
+          >
+            mock-from
+          </p>
+          <p
+            class="ml-auto w-max text-xs"
+          >
+            13:07
+          </p>
+        </div>
+        <p
+          class="mb-1 max-w-[250px] truncate text-sm"
+        >
+          mock-subject
+        </p>
+        <p
+          class="line-clamp-2 max-w-[300px] text-xs"
+        >
+          mock-text
+        </p>
+      </button>
+    </form>
+  </div>
+</div>
+`;
