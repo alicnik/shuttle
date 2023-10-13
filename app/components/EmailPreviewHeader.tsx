@@ -3,7 +3,7 @@ import { Form, Link, useSearchParams, useSubmit } from '@remix-run/react';
 import { format } from 'date-fns';
 import { Tooltip } from './Tooltip';
 import { Button, Separator } from './ui';
-import type { Email, User } from '@prisma/client';
+import type { Email } from '@prisma/client';
 import {
   EnvelopeClosedIcon,
   ExternalLinkIcon,
@@ -11,16 +11,15 @@ import {
 } from '@radix-ui/react-icons';
 import { AlertDialog, AlertDialogTrigger } from './AlertDialog';
 import { HarvestLinks } from './HarvestLinks';
+import { AccessibleIcon } from './AccessibleIcon';
 
 interface EmailPreviewHeaderProps {
   email: Email;
-  userId: User['id'];
   setSelected: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export function EmailPreviewHeader({
   email,
-  userId,
   setSelected,
 }: EmailPreviewHeaderProps) {
   const submit = useSubmit();
@@ -39,7 +38,7 @@ export function EmailPreviewHeader({
       </h3>
       <h3 className="mb-4 truncate">
         <span className="font-bold">Received:</span>{' '}
-        {format(email.createdAt, 'cccc, io MMMM yyyy @ hh:mm a')}
+        {format(email.createdAt, 'cccc, do MMMM yyyy @ hh:mm a')}
       </h3>
       <Form method="post" className="mb-4 flex gap-2">
         <input type="hidden" name="selected" value={email.id} />
@@ -51,7 +50,9 @@ export function EmailPreviewHeader({
             value="markSelectedUnread"
             className="hover:bg-zinc-300"
           >
-            <EnvelopeClosedIcon />
+            <AccessibleIcon label="Mark as unread">
+              <EnvelopeClosedIcon />
+            </AccessibleIcon>
           </Button>
         </Tooltip>
         <AlertDialog
@@ -78,13 +79,15 @@ export function EmailPreviewHeader({
                 size="icon"
                 className="hover:bg-destructive"
               >
-                <TrashIcon />
+                <AccessibleIcon label="Delete">
+                  <TrashIcon />
+                </AccessibleIcon>
               </Button>
             </AlertDialogTrigger>
           </Tooltip>
         </AlertDialog>
         <Tooltip content="Open in new window">
-          <Link to={`/${userId}/${email.id}`} target="_blank">
+          <Link to={`/${email.userId}/${email.id}`} target="_blank">
             <Button
               type="button"
               variant="ghost"
@@ -97,7 +100,9 @@ export function EmailPreviewHeader({
                 );
               }}
             >
-              <ExternalLinkIcon />
+              <AccessibleIcon label="Open in new window">
+                <ExternalLinkIcon />
+              </AccessibleIcon>
             </Button>
           </Link>
         </Tooltip>

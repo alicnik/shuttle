@@ -21,6 +21,7 @@ import type {
   LoaderFunctionArgs,
   MetaFunction,
 } from '@remix-run/node';
+import { AccessibleIcon } from '@radix-ui/react-accessible-icon';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const inboxes = await getInboxes(request);
@@ -173,7 +174,9 @@ export default function Index() {
             disabled={isRandomising}
           >
             {isRandomising ? (
-              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+              <AccessibleIcon label="Generating a random name">
+                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+              </AccessibleIcon>
             ) : (
               'Random'
             )}
@@ -186,7 +189,9 @@ export default function Index() {
             value="create"
           >
             {isCreating ? (
-              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+              <AccessibleIcon label="Creating your inbox">
+                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+              </AccessibleIcon>
             ) : (
               'Submit'
             )}

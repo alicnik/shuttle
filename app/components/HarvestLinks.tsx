@@ -13,6 +13,7 @@ import { Tooltip } from './Tooltip';
 import { Link2Icon } from '@radix-ui/react-icons';
 import { LINK_COPY_SUCCESS_MESSAGE } from '~/lib';
 import type { Email } from '@prisma/client';
+import { AccessibleIcon } from './AccessibleIcon';
 
 interface HarvestLinksProps {
   email: Email;
@@ -22,6 +23,7 @@ export function HarvestLinks({ email }: HarvestLinksProps) {
   const { toast } = useToast();
 
   const links = React.useMemo(() => {
+    /* c8 ignore next 3 */
     if (typeof window === 'undefined') {
       return [];
     }
@@ -55,7 +57,9 @@ export function HarvestLinks({ email }: HarvestLinksProps) {
             type="button"
             size="icon"
           >
-            <Link2Icon />
+            <AccessibleIcon label="Harvest links from email">
+              <Link2Icon />
+            </AccessibleIcon>
           </Button>
         </DialogTrigger>
       </Tooltip>
@@ -66,11 +70,11 @@ export function HarvestLinks({ email }: HarvestLinksProps) {
             Click a link to copy it to your clipboard
           </DialogDescription>
           {links.length > 0 ? (
-            <div className="grid auto-rows-fr grid-cols-2 place-items-center gap-x-2 gap-y-8 pt-8">
+            <ul className="grid auto-rows-fr grid-cols-2 place-items-center gap-x-2 gap-y-8 pt-8">
               {links.map((link) => {
                 return (
                   <Tooltip key={link.href} content={link.href} sideOffset={4}>
-                    <div
+                    <li
                       className="flex cursor-pointer justify-center"
                       dangerouslySetInnerHTML={{
                         __html: link.innerHTML,
@@ -85,7 +89,7 @@ export function HarvestLinks({ email }: HarvestLinksProps) {
                   </Tooltip>
                 );
               })}
-            </div>
+            </ul>
           ) : (
             <DialogDescription>
               No links were found in the email

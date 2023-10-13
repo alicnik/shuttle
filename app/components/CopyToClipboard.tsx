@@ -22,9 +22,7 @@ export function CopyToClipboard({
         data-testid="clipboard-copy-icon"
         className="translate-y-[3px] cursor-pointer"
         onClick={async () => {
-          const blob = new Blob([copyText], { type: 'text/plain' });
-          const item = new ClipboardItem({ 'text/plain': blob });
-          await navigator.clipboard.write([item]);
+          await navigator.clipboard.writeText(copyText);
           toast({ description: successMessage });
         }}
       />

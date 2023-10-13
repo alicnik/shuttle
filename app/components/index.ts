@@ -3,6 +3,7 @@ export * from './CopyToClipboard';
 export * from './EmailCard';
 export * from './EmailPreviewBody';
 export * from './EmailPreviewHeader';
+export * from './HarvestLinks';
 export * from './Theme';
 export * from './Tooltip';
 export * from './ui';

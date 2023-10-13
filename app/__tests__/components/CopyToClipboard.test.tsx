@@ -23,13 +23,11 @@ describe('CopyToClipboard', () => {
   it('should copy the text to the clipboard when the icon is clicked', async () => {
     const { user } = setup(<CopyToClipboard {...props} />, { wrapper });
 
-    vi.spyOn(navigator.clipboard, 'write');
+    vi.spyOn(navigator.clipboard, 'writeText');
 
     await user.click(screen.getByTestId('clipboard-copy-icon'));
 
-    const blob = new Blob([props.copyText], { type: 'text/plain' });
-    const item = new ClipboardItem({ 'text/plain': blob });
-    expect(navigator.clipboard.write).toHaveBeenCalledWith([item]);
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(props.copyText);
   });
 
   it('should show the success message when the icon is clicked', async () => {
