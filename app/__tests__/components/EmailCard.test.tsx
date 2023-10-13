@@ -8,18 +8,6 @@ import { EmailCard } from '~/components';
 import { useNavigation, useSearchParams } from '@remix-run/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 
-vi.mock('@remix-run/react', async () => {
-  const actual = (await vi.importActual(
-    '@remix-run/react'
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  )) as typeof import('@remix-run/react');
-  return {
-    ...actual,
-    useSearchParams: vi.fn(() => [new URLSearchParams(), vi.fn()]),
-    useNavigation: vi.fn(actual.useNavigation),
-  };
-});
-
 const props = {
   email: {
     id: 'mock-id',

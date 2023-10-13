@@ -10,7 +10,7 @@ const props = {
 
 describe('AlertDialog', () => {
   it('should open the dialog and render the expected content when the AlertDialogTrigger is clicked', async () => {
-    const { user } = setup(
+    const { container, user } = setup(
       <AlertDialog {...props}>
         <AlertDialogTrigger asChild>
           <button>Open dialog</button>
@@ -20,17 +20,7 @@ describe('AlertDialog', () => {
 
     await user.click(screen.getByRole('button', { name: /open dialog/i }));
 
-    const dialog = screen.getByRole('alertdialog');
-    const heading = screen.getByRole('heading');
-    const description = screen.getByText(props.description);
-    const cancelButton = screen.getByRole('button', { name: /cancel/i });
-    const continueButton = screen.getByRole('button', { name: /continue/i });
-
-    expect(dialog).toBeInTheDocument();
-    expect(heading).toHaveTextContent(props.title);
-    expect(description).toBeInTheDocument();
-    expect(cancelButton).toBeInTheDocument();
-    expect(continueButton).toBeInTheDocument();
+    expect(container).toMatchSnapshot();
   });
 
   it('should call the onConfirm callback when the continue button is clicked', async () => {
