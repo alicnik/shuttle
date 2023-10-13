@@ -11,6 +11,7 @@ vi.mock('~/models/user.server');
 vi.mock('~/lib/generate-random-name.server', () => ({
   generateRandomName: () => 'mock-random-name',
 }));
+vi.mock('../../../db', () => ({ db: {} }));
 
 describe('homepage', () => {
   beforeEach(async () => {
