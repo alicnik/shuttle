@@ -10,11 +10,11 @@ vi.mock('@remix-run/react', async () => {
   )) as typeof import('@remix-run/react');
   return {
     ...actual,
-    useSearchParams: vi.fn(() => [new URLSearchParams(), vi.fn()]),
-    useNavigation: vi.fn(actual.useNavigation),
-    useSubmit: vi.fn(actual.useSubmit),
-    useLoaderData: vi.fn(actual.useLoaderData),
     useActionData: vi.fn(actual.useActionData),
+    useLoaderData: vi.fn(actual.useLoaderData),
+    useSearchParams: vi.fn(actual.useSearchParams),
+    useSubmit: vi.fn(actual.useSubmit),
+    useNavigation: vi.fn(actual.useNavigation),
   };
 });
 
