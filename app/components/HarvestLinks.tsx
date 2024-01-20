@@ -24,7 +24,7 @@ export function HarvestLinks({ email }: HarvestLinksProps) {
 
   const links = React.useMemo(() => {
     /* c8 ignore next 3 */
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' || !email.html) {
       return [];
     }
     const parser = new DOMParser();

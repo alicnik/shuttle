@@ -22,11 +22,11 @@ model Email {
   createdAt DateTime @default(now()) @map("created_at")
   from      String
   subject   String?
-  html      String   @db.LongText
+  html      String?  @db.LongText
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
   read      Boolean  @default(false)
-  text      String?   @db.Text
+  text      String?  @db.Text
 
   @@index([userId])
 }

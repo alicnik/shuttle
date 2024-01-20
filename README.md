@@ -40,17 +40,20 @@ Returns the last email sent to the user.
   - `param` - (Must be used with `link`) If a value is provided, the response will be the value of the query param with the given name in the href of the link with the given text.
 
 #### Example
-```
+
+```txt
 GET https://shuttle-app.netlify.com/api/john-smith/last?link=verify%20account&param=token
 ```
 
 Assuming a DOM element like this exists in the last email sent to `john-smith`:
+
 ```html
 <a href="https://example.com/verify?token=12345">Verify Account</a>
 ```
 
 The response would be:
-```
+
+```txt
 12345
 ```
 
@@ -61,6 +64,7 @@ The response would be:
 The deployed code uses a mysql database hosted on Planetscale. The connection string is read from a local `.env` file. To set up a local mysql database for development, follow these steps:
 
 1. Install and enter MySQL
+
 ```sh
 brew install mysql
 brew services start mysql
@@ -68,16 +72,19 @@ mysql -u root
 ```
 
 2. Create a database
+
 ```sql
 CREATE DATABASE shuttle_db;
 ```
 
 3. In the root of the repo, create a `.env` and add the following:
+
 ```
 DATABASE_URL="mysql://root@localhost:3306/shuttle_db"
 ```
 
 4. Push the Prisma schema to your local database instance:
+
 ```sh
 npx prisma db push
 ```
@@ -85,6 +92,7 @@ npx prisma db push
 ### UI
 
 The UI is a Remix app. If you do not need the serverless function, i.e. the api, you can run the local Remix server by running:
+
 ```sh
 yarn dev
 ```
@@ -92,11 +100,13 @@ yarn dev
 ### Netlify functions
 
 To run the Netlify functions locally, i.e. to expose the serverless api, you can use the netlify cli. This can be installed with brew on Mac.
+
 ```sh
 brew install netlify-cli
 ```
 
 Then in the root of the repo run:
+
 ```sh
 yarn install
 netlify dev

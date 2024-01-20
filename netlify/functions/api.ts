@@ -20,6 +20,8 @@ router.post('/webhook', upload.none(), async (req, res) => {
       text: data.text,
     };
 
+    console.log({ email, data });
+
     await db.user.upsert({
       where: { id: username },
       create: {
@@ -89,11 +91,17 @@ router.get('/:userId/last', async (req, res) => {
   const { link, param } = req.query;
 
   if (link && typeof link === 'string') {
+    if (!email.html) {
+      res.status(400).send('Email did not contain any html.');
+      return;
+    }
+
     const targetLinkText = decodeURIComponent(link);
     const root = parse(email.html);
     const links = root.querySelectorAll('a');
     const targetLink = links.find(
-      ({ text }) => text.trim().toLowerCase() === targetLinkText.trim().toLowerCase()
+      ({ text }) =>
+        text.trim().toLowerCase() === targetLinkText.trim().toLowerCase()
     );
 
     if (!targetLink) {
@@ -126,7 +134,10 @@ router.get('/:userId/last', async (req, res) => {
     }
   }
 
-  res.status(200).set('Content-Type', link ? 'text/plain' : 'text/html').send(data);
+  res
+    .status(200)
+    .set('Content-Type', link ? 'text/plain' : 'text/html')
+    .send(data);
 });
 
 app.use('/api/', router);
