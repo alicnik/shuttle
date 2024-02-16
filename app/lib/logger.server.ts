@@ -1,4 +1,5 @@
 import pino from 'pino';
+import '@axiomhq/pino';
 
 const targets: pino.TransportMultiOptions['targets'] = [
   {
