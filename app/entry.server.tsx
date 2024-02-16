@@ -9,7 +9,7 @@ import type {
   EntryContext,
   LoaderFunctionArgs,
 } from '@remix-run/node';
-import { logger } from './lib/logger';
+import { logger } from './lib/logger.server';
 
 const ABORT_DELAY = 5_000;
 
