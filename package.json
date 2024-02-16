@@ -23,6 +23,7 @@
     "/server/build"
   ],
   "dependencies": {
+    "@axiomhq/pino": "^1.0.0-rc.2",
     "@netlify/functions": "^1.6.0",
     "@netlify/remix-adapter": "^1.0.0",
     "@prisma/client": "^5.1.1",
@@ -48,6 +49,8 @@
     "isbot": "^3.7.0",
     "multer": "^1.4.5-lts.1",
     "node-html-parser": "^6.1.10",
+    "pino": "^8.18.0",
+    "pino-pretty": "^10.3.1",
     "planetscale": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
