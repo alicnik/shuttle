@@ -191,9 +191,12 @@ describe('homepage', () => {
     }
   );
 
-  it('displays any inboxes that are stored in the cookie session', async () => {
+  it.only('displays any inboxes that are stored in the cookie session', async () => {
     vi.mocked(getInboxes).mockResolvedValue([
+      { username: 'another-inbox-name', date: new Date().toISOString() },
+      { username: 'careful-inbox-name', date: new Date().toISOString() },
       { username: 'mock-inbox-name', date: new Date().toISOString() },
+      { username: 'zealous-inbox-name', date: new Date().toISOString() },
     ]);
     const loaderData = await loader(fromPartial({}));
     vi.mocked(useLoaderData<typeof loader>).mockReturnValue(
@@ -201,9 +204,13 @@ describe('homepage', () => {
     );
 
     setupRemixStub(<Homepage />);
+    screen.debug();
+    const [firstInbox, secondInbox, thirdInbox, fourthInbox] =
+      screen.getAllByRole('link');
 
-    const inbox = screen.getByRole('link');
-
-    expect(inbox).toHaveTextContent('mock-inbox-name@shuttle.email');
+    expect(firstInbox).toHaveTextContent('another-inbox-name@shuttle.email');
+    expect(secondInbox).toHaveTextContent('careful-inbox-name@shuttle.email');
+    expect(thirdInbox).toHaveTextContent('mock-inbox-name@shuttle.email');
+    expect(fourthInbox).toHaveTextContent('zealous-inbox-name@shuttle.email');
   });
 });
