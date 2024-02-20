@@ -10,6 +10,7 @@ import {
 } from '@remix-run/react';
 import { Toaster } from '~/components/ui/toaster';
 import type { LoaderFunctionArgs, LinksFunction } from '@remix-run/node';
+import type { Theme } from 'remix-themes';
 import {
   PreventFlashOnWrongTheme,
   ThemeProvider,
@@ -40,14 +41,14 @@ export default function App() {
 
   return (
     <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
-      <Document theme={data.theme}>
+      <DocumentWithTheme theme={data.theme}>
         <Outlet />
-      </Document>
+      </DocumentWithTheme>
     </ThemeProvider>
   );
 }
 
-function Document({
+function DocumentWithTheme({
   title,
   children,
   theme,
@@ -57,6 +58,23 @@ function Document({
 }>) {
   const [currentTheme] = useTheme();
 
+  return (
+    <Document title={title} theme={theme} currentTheme={currentTheme}>
+      {children}
+    </Document>
+  );
+}
+
+function Document({
+  title,
+  children,
+  theme,
+  currentTheme,
+}: React.PropsWithChildren<{
+  title?: string;
+  theme?: Awaited<ReturnType<typeof loader>>['theme'];
+  currentTheme?: Theme | null;
+}>) {
   return (
     <html
       suppressHydrationWarning
