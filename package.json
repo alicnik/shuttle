@@ -25,7 +25,7 @@
   "dependencies": {
     "@netlify/functions": "^1.6.0",
     "@netlify/remix-adapter": "^1.0.0",
-    "@prisma/client": "^5.1.1",
+    "@prisma/client": "^5.10.2",
     "@radix-ui/react-accessible-icon": "^1.0.3",
     "@radix-ui/react-alert-dialog": "^1.0.4",
     "@radix-ui/react-checkbox": "^1.0.4",
@@ -79,13 +79,14 @@
     "jsdom": "^22.1.0",
     "prettier": "^2.6.2",
     "prettier-plugin-tailwindcss": "^0.3.0",
-    "prisma": "^5.1.1",
+    "prisma": "^5.10.2",
     "tailwindcss": "^3.0.23",
-    "typescript": "^4.6.3",
+    "typescript": "^5.1.0",
     "vite-tsconfig-paths": "^4.2.1",
     "vitest": "^0.34.6"
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "packageManager": "yarn@4.1.1"
 }

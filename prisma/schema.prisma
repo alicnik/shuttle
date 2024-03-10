@@ -6,9 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -22,11 +21,9 @@ model Email {
   createdAt DateTime @default(now()) @map("created_at")
   from      String
   subject   String?
-  html      String?  @db.LongText
+  html      String?  @db.Text
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
   read      Boolean  @default(false)
   text      String?  @db.Text
-
-  @@index([userId])
 }
