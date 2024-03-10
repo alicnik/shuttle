@@ -6,6 +6,8 @@ declare global {
       DB_TOKEN: string;
       DB_TOKEN_NAME: string;
       SESSION_SECRET: string;
+      AXIOM_TOKEN: string;
+      AXIOM_DATASET: string;
     }
   }
 }

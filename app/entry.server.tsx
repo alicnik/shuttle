@@ -3,7 +3,13 @@ import { createReadableStreamFromReadable } from '@remix-run/node';
 import { RemixServer } from '@remix-run/react';
 import { renderToPipeableStream } from 'react-dom/server';
 import isbot from 'isbot';
-import type { AppLoadContext, EntryContext } from '@remix-run/node';
+import type {
+  ActionFunctionArgs,
+  AppLoadContext,
+  EntryContext,
+  LoaderFunctionArgs,
+} from '@remix-run/node';
+import { logger } from './lib/logger.server';
 
 const ABORT_DELAY = 5_000;
 
@@ -27,6 +33,30 @@ export default function handleRequest(
         responseHeaders,
         remixContext
       );
+}
+
+export function handleError(
+  error: unknown,
+  { request, params, context }: LoaderFunctionArgs | ActionFunctionArgs
+) {
+  if (!request.signal.aborted) {
+    if (error instanceof Error) {
+      logger.error(
+        {
+          message: error.message,
+          stack: error.stack,
+          type: 'type' in error ? error.type : undefined,
+          request,
+          params,
+          context,
+        },
+        error.message
+      );
+      return;
+    }
+
+    logger.error(error, 'Unknown error');
+  }
 }
 
 function handleBotRequest(
