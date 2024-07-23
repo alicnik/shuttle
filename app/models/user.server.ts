@@ -7,6 +7,7 @@ export const getUser = async (username: string) => {
     },
     include: {
       emails: {
+        take: 10,
         orderBy: {
           createdAt: 'desc',
         },
