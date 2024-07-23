@@ -20,6 +20,7 @@ describe('User', () => {
       },
       include: {
         emails: {
+          take: 10,
           orderBy: {
             createdAt: 'desc',
           },
