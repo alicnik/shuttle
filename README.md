@@ -7,9 +7,11 @@ An email testing app that offers a UI and an API for processing inbound emails t
 - Sendgrid Inbound Parse Webhook
 - Netlify Functions
 - Netlify hosting and DNS
-- Planetscale
+- Neon DB
 - Remix
 - React
+- Prisma
+- Axiom (logging)
 
 ## What can it do?
 
@@ -61,33 +63,27 @@ The response would be:
 
 ### Database
 
-The deployed code uses a mysql database hosted on Planetscale. The connection string is read from a local `.env` file. To set up a local mysql database for development, follow these steps:
+The deployed code uses a postgres database hosted on NeonDB. The connection string is read from a local `.env` file. To set up a local mysql database for development, follow these steps:
 
-1. Install and enter MySQL
+1. Install postgres and create a database
 
-```sh
-brew install mysql
-brew services start mysql
-mysql -u root
-```
+   ```sh
+   brew install postgresql
+   brew services start postgresql
+   createdb shuttle_db
+   ```
 
-2. Create a database
+2. In the root of the repo, create a `.env` and add the following:
 
-```sql
-CREATE DATABASE shuttle_db;
-```
+   ```sh
+   DATABASE_URL="postgresql://<username>:<password>@localhost:5432/shuttle_db"
+   ```
 
-3. In the root of the repo, create a `.env` and add the following:
+3. Push the Prisma schema to your local database instance:
 
-```
-DATABASE_URL="mysql://root@localhost:3306/shuttle_db"
-```
-
-4. Push the Prisma schema to your local database instance:
-
-```sh
-npx prisma db push
-```
+   ```sh
+   npx prisma db push
+   ```
 
 ### UI
 
@@ -115,7 +111,3 @@ netlify dev
 ## Deployment
 
 CD is setup on `main`. Any changes to the `main` branch will be automatically deployed to production.
-
-## Useful Resources
-
-- [Prisma Planetscale Docs](https://www.prisma.io/docs/guides/database/planetscale)
