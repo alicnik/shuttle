@@ -20,8 +20,6 @@ router.post('/webhook', upload.none(), async (req, res) => {
       text: data.text,
     };
 
-    console.log({ email, data });
-
     await db.user.upsert({
       where: { id: username },
       create: {
