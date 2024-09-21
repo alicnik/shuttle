@@ -115,6 +115,12 @@ function handleBrowserRequest(
   responseHeaders: Headers,
   remixContext: EntryContext
 ) {
+  console.log('handling browser request', {
+    request,
+    responseStatusCode,
+    responseHeaders,
+    remixContext,
+  });
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     const { pipe, abort } = renderToPipeableStream(

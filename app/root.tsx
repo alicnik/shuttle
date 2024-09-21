@@ -1,4 +1,5 @@
 import {
+  isRouteErrorResponse,
   Link,
   Links,
   LiveReload,
@@ -7,6 +8,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useRouteError,
 } from '@remix-run/react';
 import { Toaster } from '~/components/ui/toaster';
 import type { LoaderFunctionArgs, LinksFunction } from '@remix-run/node';
@@ -66,14 +68,16 @@ function DocumentWithTheme({
 }
 
 function Document({
-  title,
   children,
-  theme,
   currentTheme,
+  isError,
+  theme,
+  title,
 }: React.PropsWithChildren<{
-  title?: string;
-  theme?: Awaited<ReturnType<typeof loader>>['theme'];
   currentTheme?: Theme | null;
+  isError?: boolean;
+  theme?: Awaited<ReturnType<typeof loader>>['theme'];
+  title?: string;
 }>) {
   return (
     <html
@@ -85,7 +89,7 @@ function Document({
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
-        <PreventFlashOnWrongTheme ssrTheme={Boolean(theme)} />
+        {!isError && <PreventFlashOnWrongTheme ssrTheme={Boolean(theme)} />}
         {title ? <title>{title}</title> : null}
         <Links />
       </head>
@@ -101,8 +105,12 @@ function Document({
 }
 
 export function ErrorBoundary() {
+  const error = useRouteError();
+
+  const isError = error instanceof Error || isRouteErrorResponse(error);
+
   return (
-    <Document title="Uh-oh!">
+    <Document title="Uh-oh!" isError={isError}>
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
         <h1 className="mb-4 text-3xl">Oh dear, something went wrong.</h1>
         <p className="mb-6 text-lg">Click below to go back to safety...</p>
