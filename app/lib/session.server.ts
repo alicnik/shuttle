@@ -1,5 +1,6 @@
 import type { Session } from '@remix-run/node';
 import { createCookieSessionStorage } from '@remix-run/node';
+import { logger } from './logger.server';
 
 const { getSession, commitSession } = createCookieSessionStorage<{
   inboxes: SessionInbox[];
@@ -38,6 +39,14 @@ export const syncSession = async (request: Request, username?: string) => {
       username,
       date: new Date().toISOString().slice(0, 10),
     });
+  }
+
+  try {
+    if (JSON.stringify(todaysInboxes.length > 4000)) {
+      logger.error('Session too large', { data: todaysInboxes });
+    }
+  } catch (error) {
+    logger.error('Error checking session size', { error });
   }
 
   session.set('inboxes', todaysInboxes);
