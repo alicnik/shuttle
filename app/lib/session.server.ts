@@ -47,5 +47,6 @@ export const syncSession = async (request: Request, username?: string) => {
 
 export const getInboxes = async (request: Request) => {
   const session = await getShuttleSession(request);
-  return getTodaysInboxes(session);
+  const inboxes = getTodaysInboxes(session);
+  return inboxes.sort((a, b) => a.username.localeCompare(b.username));
 };
